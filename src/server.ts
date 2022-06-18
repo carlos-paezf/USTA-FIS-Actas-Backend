@@ -1,0 +1,6 @@
+class ServerBootstrap {
+
+}
+
+
+new ServerBootstrap()

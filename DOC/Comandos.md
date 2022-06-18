@@ -44,7 +44,7 @@
 - Instalar dependencias de desarrollo:
 
   ```txt
-  pnpm install -D @types/bcrypt @types/cors @types/express @types/express-validator @types/jsonwebtoken @types/morgan @types/multer @types/node@"*" @types/passport @types/passport-jwt @types/passport-local concurrently nodemon ts-node
+  pnpm install -D @types/bcrypt @types/cors @types/express @types/express-validator @types/jsonwebtoken @types/morgan @types/multer @types/node@"*" @types/passport @types/passport-jwt @types/passport-local concurrently eslint nodemon ts-node
   ```
 
 - Configurar scripts del proyecto en `package.json`:
@@ -93,4 +93,22 @@
 
   ```txt
   pnpm m:run
+  ```
+
+- Activación de ESLint
+
+  ```txt
+  npx eslint --init
+  ```
+
+- Conocer la complejidad de los archivos
+
+  ```txt
+  npx code-complexity . --filter '**/*.ts' --limit 10 --sort score
+  ```
+
+- Conocer las dependencias duplicadas en el proyecto
+  
+  ```txt
+  npx qnm doctor --sort duplicates
   ```
