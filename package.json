@@ -15,7 +15,8 @@
         "typeorm": "typeorm-ts-node-esm -d ./src/config/data.config.ts",
         "m:gen": "npm run typeorm migration:generate",
         "m:run": "npm run typeorm migration:run",
-        "docker": "docker-compose up -d"
+        "docker": "docker-compose up -d",
+        "docker:logs": "docker-compose logs -f"
     },
     "repository": {
         "type": "git",
@@ -29,6 +30,7 @@
     },
     "homepage": "https://github.com/carlos-paezf/USTA-FIS-Actas-Backend#readme",
     "dependencies": {
+        "@slack/webhook": "^6.1.0",
         "bcrypt": "^5.0.1",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.13.2",
@@ -40,6 +42,7 @@
         "jsonwebtoken": "^8.5.1",
         "morgan": "^1.10.0",
         "multer": "1.4.5-lts.1",
+        "mysql": "^2.18.1",
         "passport": "^0.6.0",
         "passport-jwt": "^4.0.0",
         "passport-local": "^1.0.0",

@@ -1,0 +1,7 @@
+export enum RoleType {
+    DEAN = 'DEAN',
+    ADMINISTRATIVE = 'ADMINISTRATIVE',
+    PROFESSOR = 'PROFESSOR',
+    USER = 'USER',
+    DEVELOPER = 'DEVELOPER'
+}

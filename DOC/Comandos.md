@@ -38,7 +38,7 @@
 - Instalar dependencias de producción a usar en el proyecto:
   
   ```txt
-  pnpm install bcrypt class-transformer class-validator colors cors dotenv express express-validator jsonwebtoken morgan multer passport passport-jwt passport-local reflect-metadata typeorm typeorm-naming-strategies typescript -S
+  pnpm install @slack/webhook bcrypt class-transformer class-validator colors cors dotenv express express-validator jsonwebtoken morgan multer mysql passport passport-jwt passport-local reflect-metadata typeorm typeorm-naming-strategies typescript -S
   ```
 
 - Instalar dependencias de desarrollo:
@@ -86,7 +86,7 @@
 - Generar migraciones
 
   ```txt
-  pnpm m:gen
+  pnpm m:gen -- src/migrations/<migrationName>
   ```
 
 - Correr migraciones
