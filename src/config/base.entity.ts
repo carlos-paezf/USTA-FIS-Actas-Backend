@@ -1,4 +1,4 @@
-import { CreateDateColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, PrimaryGeneratedColumn } from "typeorm";
 
 
 /**
@@ -10,6 +10,9 @@ import { CreateDateColumn, PrimaryGeneratedColumn } from "typeorm";
 export abstract class BaseEntity {
     @PrimaryGeneratedColumn(`uuid`)
     id!: string
+
+    @Column({ nullable: false, type: "boolean", default: true })
+    status!: boolean
 
     @CreateDateColumn({
         name: `created_at`,

@@ -13,7 +13,7 @@ export abstract class BaseService<T extends BaseEntity> extends ConfigServer {
 
     constructor(private _getEntity: EntityTarget<T>) {
         super()
-        this.execRepository = this.initRepository(_getEntity)
+        this.execRepository = this.initRepository(this._getEntity)
     }
 
     /**

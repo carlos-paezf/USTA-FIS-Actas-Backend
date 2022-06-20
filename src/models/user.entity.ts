@@ -22,6 +22,6 @@ export class UserEntity extends BaseEntity {
     @Column({ select: false, nullable: false })
     password!: string
 
-    @Column({ type: 'enum', enum: RoleType, nullable: false })
+    @Column({ type: 'enum', enum: RoleType, nullable: false, default: RoleType.PROFESSOR })
     role!: RoleType
 }

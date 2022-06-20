@@ -8,6 +8,7 @@ import { blue, green, red } from 'colors'
 
 import { IncomingWebhook } from '@slack/webhook'
 import { ConfigServer } from './config'
+import { UserRouter } from './routes'
 
 
 /**
@@ -23,7 +24,7 @@ class ServerBootstrap extends ConfigServer {
 
         this._app.use(express.json())
         this._app.use(express.urlencoded({ extended: true }))
-        this._app.use(morgan('common', {
+        this._app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :req[header] :res', {
             skip: function (req, res) { return res.statusCode < 400 },
             stream: {
                 write: text => { this._webHook.send({ text }) }
@@ -34,8 +35,7 @@ class ServerBootstrap extends ConfigServer {
         this._passportUse()
         this._dbConnect()
 
-        // this._app.use('/api/', this._routers())
-        this._app.use('/api/', (req, res) => { res.send('hola') })
+        this._app.use('/api/', this._routers())
 
         this._listen()
     }
@@ -45,7 +45,9 @@ class ServerBootstrap extends ConfigServer {
      * A function that returns an array of express routers.
      */
     private _routers = (): express.Router[] => {
-        return []
+        return [
+            new UserRouter().router
+        ]
     }
 
     private _passportUse = () => {
