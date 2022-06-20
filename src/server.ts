@@ -6,9 +6,9 @@ import cors from 'cors'
 import { DataSource } from 'typeorm'
 import { blue, green, red } from 'colors'
 
-import { IncomingWebhook } from '@slack/webhook'
 import { ConfigServer } from './config'
 import { UserRouter } from './routes'
+// import { loggerStream } from './helpers/logger.helper'
 
 
 /**
@@ -17,20 +17,21 @@ import { UserRouter } from './routes'
 class ServerBootstrap extends ConfigServer {
     private _app: express.Application = express()
     private _port: number = this.getNumberEnv(`PORT`) || 3000
-    private _webHook = new IncomingWebhook(this.getEnvironment(`SLACK_WEBHOOK`) || ``)
 
     constructor() {
         super()
 
         this._app.use(express.json())
         this._app.use(express.urlencoded({ extended: true }))
-        this._app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :req[header] :res', {
-            skip: function (req, res) { return res.statusCode < 400 },
-            stream: {
-                write: text => { this._webHook.send({ text }) }
-            }
-        }))
         this._app.use(cors())
+        /* this._app.use(morgan(
+            ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :req[header] :res[content-type]',
+            {
+                skip: function (req, res) { return res.statusCode < 400 },
+                stream: loggerStream
+            }
+        )) */
+        this._app.use(morgan('common'))
 
         this._passportUse()
         this._dbConnect()
@@ -74,4 +75,5 @@ class ServerBootstrap extends ConfigServer {
 }
 
 
+console.clear()
 new ServerBootstrap()

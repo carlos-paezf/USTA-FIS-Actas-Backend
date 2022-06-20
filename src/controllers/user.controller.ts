@@ -18,15 +18,26 @@ export class UserController {
         private readonly _httpResponse: HttpResponse = new HttpResponse()
     ) { }
 
-    public findAllUsers = async (req: Request, res: Response): Promise<unknown> => {
+    public findUsers = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const data = await this._userService.findAllUsers()
+            const { from = 0, limit = 10, all = false, disabled = false, order = 'ASC' } = req.query
 
+            const [data, totalCount] = await this._userService.findUsers(
+                Number(from),
+                Number(limit),
+                Boolean(all),
+                Boolean(disabled),
+                String(order).toUpperCase()
+            )
             if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the search`)
 
-            return this._httpResponse.Ok(res, data)
+            return this._httpResponse.Ok(res, {
+                from, limit, all, disabled, order,
+                partialCount: data.length, totalCount,
+                data
+            })
         } catch (error) {
-            console.log(red(`Error in UserController:findAllUsers: `), error)
+            console.log(red(`Error in UserController:findUsers: `), error)
             return this._httpResponse.InternalServerError(res, error)
         }
     }
@@ -59,21 +70,97 @@ export class UserController {
     public updateUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
-            const data: UpdateResult = await this._userService.updateUserById(id, { ...req.body })
+            const { email, username, password, ...infoUpdate } = req.body
+            const data: UpdateResult = await this._userService.updateUserById(id, { ...infoUpdate })
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
-            console.log(red(`Error in UserController:updateUser: `), error)
+            console.log(red(`Error in UserController:updateUserById: `), error)
             return this._httpResponse.InternalServerError(res, error)
         }
     }
 
-    public destroyUserById = async (req: Request, res: Response): Promise<unknown> => {
+    public updateUsernameById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
-            const data: DeleteResult = await this._userService.destroyUserById(id)
+            const { username } = req.body
+            const data: UpdateResult = await this._userService.updateUsernameById(id, username)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in UserController:updateUsername: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public updateEmailById = async (req: Request, res: Response): Promise<unknown> => {
+        try {
+            const { id } = req.params
+            const { email } = req.body
+            const data: UpdateResult = await this._userService.updateEmailById(id, email)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in UserController:updateEmail: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public updatePasswordById = async (req: Request, res: Response): Promise<unknown> => {
+        try {
+            const { id } = req.params
+            const { password } = req.body
+            const data: UpdateResult = await this._userService.updatePasswordById(id, password)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in UserController:updatePassword: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public enableUserById = async (req: Request, res: Response): Promise<unknown> => {
+        try {
+            const { id } = req.params
+
+            const data: UpdateResult = await this._userService.enableUserById(id)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in UserController:enableUserById: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public disableUserById = async (req: Request, res: Response): Promise<unknown> => {
+        try {
+            const { id } = req.params
+
+            const data: UpdateResult = await this._userService.disableUserById(id)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in UserController:disableUserById: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public softDeleteUserById = async (req: Request, res: Response): Promise<unknown> => {
+        try {
+            const { id } = req.params
+            const data: DeleteResult = await this._userService.softDeleteUserById(id)
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${id}'`)
 
@@ -84,12 +171,12 @@ export class UserController {
         }
     }
 
-    public deleteUserById = async (req: Request, res: Response): Promise<unknown> => {
+    public destroyUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
             const data: DeleteResult = await this._userService.destroyUserById(id)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to destroy the id '${id}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
