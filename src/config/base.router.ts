@@ -7,7 +7,7 @@ import { Router } from "express";
  * 
  * @author Carlos Páez
  */
-export class BaseRouter<T, U> {
+export abstract class BaseRouter<T, U> {
     public router: Router
     protected controller: T
     protected middleware: U

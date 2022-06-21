@@ -22,6 +22,13 @@ export class PermissionService extends BaseService<PermissionEntity> {
         return (await this.execRepository).findOneBy({ id })
     }
 
+    public async findOnePermissionByIdIncludeDeleted(id: string): Promise<PermissionEntity | null> {
+        return (await this.execRepository).findOne({
+            where: { id },
+            withDeleted: true
+        })
+    }
+
     public async findOnePermissionByName(permissionName: string): Promise<PermissionEntity | null> {
         return (await this.execRepository)
             .createQueryBuilder('permission')
@@ -49,5 +56,12 @@ export class PermissionService extends BaseService<PermissionEntity> {
 
     public async destroyPermissionById(id: string): Promise<DeleteResult> {
         return (await this.execRepository).delete(id)
+    }
+
+    public async permissionIsEnabled(id: string): Promise<PermissionEntity | null> {
+        return (await this.execRepository).findOne({
+            where: { id, deletedAt: undefined },
+            select: { id: true }
+        })
     }
 }

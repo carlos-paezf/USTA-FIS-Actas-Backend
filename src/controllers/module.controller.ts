@@ -1,21 +1,21 @@
 import { red } from "colors";
 import { Request, Response } from "express";
 import { DeleteResult, UpdateResult } from "typeorm";
+
+import { BaseController } from "../config";
 import { ModuleService } from "../services";
-import { HttpResponse } from "../shared/response/http.response";
 
 
-export class ModuleController {
-    constructor(
-        private readonly _moduleService: ModuleService = new ModuleService(),
-        private readonly _httpResponse: HttpResponse = new HttpResponse()
-    ) { }
+export class ModuleController extends BaseController<ModuleService> {
+    constructor() {
+        super(ModuleService)
+    }
 
     public findModules = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { from = 0, limit = 0, all = false, order = 'ASC' } = req.query
 
-            const [data, totalCount] = await this._moduleService.findAllModules(
+            const [data, totalCount] = await this._service.findAllModules(
                 Number(from),
                 Number(limit),
                 Boolean(all),
@@ -38,8 +38,11 @@ export class ModuleController {
     public findOneModuleById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
+            const { deleted } = req.query
 
-            const data = await this._moduleService.findOneModuleById(id)
+            const data = deleted
+                ? await this._service.findOneModuleByIdIncludeDeleted(id)
+                : await this._service.findOneModuleById(id)
 
             if (!data) return this._httpResponse.BadRequest(res, `There are no results for the id '${id}'`)
 
@@ -52,7 +55,7 @@ export class ModuleController {
 
     public createModule = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const data = await this._moduleService.createModule({ ...req.body })
+            const data = await this._service.createModule({ ...req.body })
 
             return this._httpResponse.Created(res, data)
         } catch (error) {
@@ -65,7 +68,7 @@ export class ModuleController {
         try {
             const { id } = req.params
 
-            const data: UpdateResult = await this._moduleService.updateModuleById(id, { ...req.body })
+            const data: UpdateResult = await this._service.updateModuleById(id, { ...req.body })
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
 
@@ -78,11 +81,11 @@ export class ModuleController {
 
     public softDeleteModuleById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
+            const { idDisabled } = req.params
 
-            const data: DeleteResult = await this._moduleService.softDeleteModuleById(id)
+            const data: DeleteResult = await this._service.softDeleteModuleById(idDisabled)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${idDisabled}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
@@ -93,11 +96,11 @@ export class ModuleController {
 
     public restoreModuleById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
+            const { idRestore } = req.params
 
-            const data: UpdateResult = await this._moduleService.restoreModuleById(id)
+            const data: UpdateResult = await this._service.restoreModuleById(idRestore)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to restore the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to restore the id '${idRestore}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
@@ -108,10 +111,10 @@ export class ModuleController {
 
     public destroyModuleById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
-            const data: DeleteResult = await this._moduleService.destroyModuleById(id)
+            const { idDestroy } = req.params
+            const data: DeleteResult = await this._service.destroyModuleById(idDestroy)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to destroy the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to destroy the id '${idDestroy}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {

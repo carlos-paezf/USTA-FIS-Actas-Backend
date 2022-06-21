@@ -27,10 +27,14 @@ export class ModuleRouter extends BaseRouter<ModuleController, ModuleMiddleware>
             this.controller.updateModuleById
         )
 
-        this.router.patch('/modules/restore/:id', this.controller.restoreModuleById)
+        this.router.param('idDisabled', this.middleware.idDisabledValidator)
 
-        this.router.patch('/modules/disabled/:id', this.controller.softDeleteModuleById)
+        this.router.patch('/modules/disabled/:idDisabled', this.controller.softDeleteModuleById)
 
-        this.router.delete('/modules/destroy/:id', this.controller.destroyModuleById)
+        this.router.param('idRestore', this.middleware.idRestoreValidator)
+
+        this.router.patch('/modules/restore/:idRestore', this.controller.restoreModuleById)
+
+        this.router.delete('/modules/destroy/:idDestroy', this.controller.destroyModuleById)
     }
 }

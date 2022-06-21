@@ -27,10 +27,14 @@ export class RoleRouter extends BaseRouter<RoleController, RoleMiddleware> {
             this.controller.updateRoleById
         )
 
-        this.router.patch('/roles/restore/:id', this.controller.restoreRoleById)
+        this.router.param('idDisabled', this.middleware.idDisabledValidator)
 
-        this.router.patch('/roles/disabled/:id', this.controller.softDeleteRoleById)
+        this.router.patch('/roles/disabled/:idDisabled', this.controller.softDeleteRoleById)
 
-        this.router.delete('/roles/destroy/:id', this.controller.destroyRoleById)
+        this.router.param('idRestore', this.middleware.idRestoreValidator)
+
+        this.router.patch('/roles/restore/:idRestore', this.controller.restoreRoleById)
+
+        this.router.delete('/roles/destroy/:idDestroy', this.controller.destroyRoleById)
     }
 }

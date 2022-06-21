@@ -22,6 +22,13 @@ export class RoleService extends BaseService<RoleEntity> {
         return (await this.execRepository).findOneBy({ id })
     }
 
+    public async findOneRoleByIdIncludeDeleted(id: string): Promise<RoleEntity | null> {
+        return (await this.execRepository).findOne({
+            where: { id },
+            withDeleted: true
+        })
+    }
+
     public async findOneRoleByName(roleName: string): Promise<RoleEntity | null> {
         return (await this.execRepository)
             .createQueryBuilder('role')
@@ -49,5 +56,12 @@ export class RoleService extends BaseService<RoleEntity> {
 
     public async destroyRoleById(id: string): Promise<DeleteResult> {
         return (await this.execRepository).delete(id)
+    }
+
+    public async roleIsEnabled(id: string): Promise<RoleEntity | null> {
+        return (await this.execRepository).findOne({
+            where: { id, deletedAt: undefined },
+            select: { id: true }
+        })
     }
 }

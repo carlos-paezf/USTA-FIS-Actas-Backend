@@ -1,21 +1,21 @@
 import { red } from "colors";
 import { Request, Response } from "express";
 import { DeleteResult, UpdateResult } from "typeorm";
+
+import { BaseController } from "../config";
 import { RoleService } from "../services";
-import { HttpResponse } from "../shared/response/http.response";
 
 
-export class RoleController {
-    constructor(
-        private readonly _roleService: RoleService = new RoleService(),
-        private readonly _httpResponse: HttpResponse = new HttpResponse()
-    ) { }
+export class RoleController extends BaseController<RoleService> {
+    constructor() {
+        super(RoleService)
+    }
 
     public findRoles = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { from = 0, limit = 0, all = false, order = 'ASC' } = req.query
 
-            const [data, totalCount] = await this._roleService.findAllRoles(
+            const [data, totalCount] = await this._service.findAllRoles(
                 Number(from),
                 Number(limit),
                 Boolean(all),
@@ -38,8 +38,11 @@ export class RoleController {
     public findOneRoleById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
+            const { deleted } = req.query
 
-            const data = await this._roleService.findOneRoleById(id)
+            const data = deleted
+                ? await this._service.findOneRoleByIdIncludeDeleted(id)
+                : await this._service.findOneRoleById(id)
 
             if (!data) return this._httpResponse.BadRequest(res, `There are no results for the id '${id}'`)
 
@@ -52,7 +55,7 @@ export class RoleController {
 
     public createRole = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const data = await this._roleService.createRole({ ...req.body })
+            const data = await this._service.createRole({ ...req.body })
 
             return this._httpResponse.Created(res, data)
         } catch (error) {
@@ -65,7 +68,7 @@ export class RoleController {
         try {
             const { id } = req.params
 
-            const data: UpdateResult = await this._roleService.updateRoleById(id, { ...req.body })
+            const data: UpdateResult = await this._service.updateRoleById(id, { ...req.body })
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
 
@@ -78,11 +81,11 @@ export class RoleController {
 
     public softDeleteRoleById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
+            const { idDisabled } = req.params
 
-            const data: DeleteResult = await this._roleService.softDeleteRoleById(id)
+            const data: DeleteResult = await this._service.softDeleteRoleById(idDisabled)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${idDisabled}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
@@ -93,11 +96,11 @@ export class RoleController {
 
     public restoreRoleById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
+            const { idRestore } = req.params
 
-            const data: UpdateResult = await this._roleService.restoreRoleById(id)
+            const data: UpdateResult = await this._service.restoreRoleById(idRestore)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to restore the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to restore the id '${idRestore}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
@@ -108,10 +111,10 @@ export class RoleController {
 
     public destroyRoleById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
-            const data: DeleteResult = await this._roleService.destroyRoleById(id)
+            const { idDestroy } = req.params
+            const data: DeleteResult = await this._service.destroyRoleById(idDestroy)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to destroy the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to destroy the id '${idDestroy}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {

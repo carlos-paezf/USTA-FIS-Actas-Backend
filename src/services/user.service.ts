@@ -55,6 +55,18 @@ export class UserService extends BaseService<UserEntity> {
     }
 
     /**
+     * Find one user by id, including deleted users.
+     * @param {string} id - string - the id of the user
+     * @returns A promise of a UserEntity or null
+     */
+    public async findOneUserByIdIncludeDeleted(id: string): Promise<UserEntity | null> {
+        return (await this.execRepository).findOne({
+            where: { id },
+            withDeleted: true
+        })
+    }
+
+    /**
      * Find a user by email, and return the user's password.
      * @param {string} email - string - the email of the user
      * @returns A UserEntity object with the password property.
@@ -161,5 +173,17 @@ export class UserService extends BaseService<UserEntity> {
      */
     public async destroyUserById(id: string): Promise<DeleteResult> {
         return (await this.execRepository).delete({ id })
+    }
+
+    /**
+     * Find a user by id, and if the user is not deleted, return the user's id.
+     * @param {string} id - string - the id of the user
+     * @returns The user entity with the id and deletedAt fields.
+     */
+    public async userIsEnabled(id: string): Promise<UserEntity | null> {
+        return (await this.execRepository).findOne({
+            where: { id, deletedAt: undefined },
+            select: { id: true }
+        })
     }
 }

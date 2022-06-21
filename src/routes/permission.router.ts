@@ -11,26 +11,30 @@ export class PermissionRouter extends BaseRouter<PermissionController, Permissio
     protected routes(): void {
         this.router.param('id', this.middleware.idParamValidator)
 
-        this.router.get('/permission', this.controller.findPermissions)
+        this.router.get('/permissions', this.controller.findPermissions)
 
-        this.router.get('/permission/:id', this.controller.findOnePermissionById)
+        this.router.get('/permissions/:id', this.controller.findOnePermissionById)
 
         this.router.post(
-            '/permission',
+            '/permissions',
             [this.middleware.permissionNameValidator, this.middleware.permissionValidator,],
             this.controller.createPermission
         )
 
         this.router.put(
-            '/permission/:id',
+            '/permissions/:id',
             [this.middleware.permissionNameValidator],
             this.controller.updatePermissionById
         )
 
-        this.router.patch('/permission/restore/:id', this.controller.restorePermissionById)
+        this.router.param('idDisabled', this.middleware.idDisabledValidator)
 
-        this.router.patch('/permission/disabled/:id', this.controller.softDeletePermissionById)
+        this.router.patch('/permissions/disabled/:idDisabled', this.controller.softDeletePermissionById)
 
-        this.router.delete('/permission/destroy/:id', this.controller.destroyPermissionById)
+        this.router.param('idRestore', this.middleware.idRestoreValidator)
+
+        this.router.patch('/permissions/restore/:idRestore', this.controller.restorePermissionById)
+
+        this.router.delete('/permissions/destroy/:idDestroy', this.controller.destroyPermissionById)
     }
 }

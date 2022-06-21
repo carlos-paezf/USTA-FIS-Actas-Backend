@@ -17,13 +17,17 @@ export class UserRouter extends BaseRouter<UserController, UserMiddleware> {
 
         this.router.post(
             '/users',
-            [this.middleware.usernameAndEmailValidator, this.middleware.userValidator,],
+            [
+                this.middleware.usernameAndEmailValidator,
+                this.middleware.validateRoleIsEnabled,
+                this.middleware.userValidator
+            ],
             this.controller.createUser
         )
 
         this.router.put(
             '/users/:id',
-            [this.middleware.userValidator],
+            [this.middleware.validateRoleIsEnabled, this.middleware.userValidator],
             this.controller.updateUserById
         )
 
@@ -41,10 +45,14 @@ export class UserRouter extends BaseRouter<UserController, UserMiddleware> {
 
         this.router.patch('/users/update-password/:id', this.controller.updatePasswordById)
 
-        this.router.patch('/users/restore/:id', this.controller.restoreUserById)
+        this.router.param('idDisabled', this.middleware.idDisabledValidator)
 
-        this.router.patch('/users/disabled/:id', this.controller.softDeleteUserById)
+        this.router.patch('/users/disabled/:idDisabled', this.controller.softDeleteUserById)
 
-        this.router.delete('/users/destroy/:id', this.controller.destroyUserById)
+        this.router.param('idRestore', this.middleware.idRestoreValidator)
+
+        this.router.patch('/users/restore/:idRestore', this.controller.restoreUserById)
+
+        this.router.delete('/users/destroy/:idDestroy', this.controller.destroyUserById)
     }
 }

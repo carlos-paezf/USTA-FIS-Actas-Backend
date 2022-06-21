@@ -13,6 +13,7 @@ export enum HttpStatus {
     UNAUTHORIZED = 401,
     FORBIDDEN = 403,
     NOT_FOUND = 404,
+    PRECONDITION_FAILED = 412,
     INTERNAL_SERVER_ERROR = 500
 }
 
@@ -113,6 +114,14 @@ export class HttpResponse {
         return res.status(HttpStatus.NOT_FOUND).json({
             status: HttpStatus.NOT_FOUND,
             statusMsg: 'Not Found',
+            error: data
+        })
+    }
+
+    public PreconditionFailed(res: Response, data?: unknown): Response<unknown> {
+        return res.status(HttpStatus.PRECONDITION_FAILED).json({
+            status: HttpStatus.PRECONDITION_FAILED,
+            statusMsg: 'Precondition Failed',
             error: data
         })
     }

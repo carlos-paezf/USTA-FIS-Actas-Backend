@@ -1,21 +1,21 @@
 import { red } from "colors";
 import { Request, Response } from "express";
 import { DeleteResult, UpdateResult } from "typeorm";
+
+import { BaseController } from "../config";
 import { PermissionService } from "../services";
-import { HttpResponse } from "../shared/response/http.response";
 
 
-export class PermissionController {
-    constructor(
-        private readonly _permissionService: PermissionService = new PermissionService(),
-        private readonly _httpResponse: HttpResponse = new HttpResponse()
-    ) { }
+export class PermissionController extends BaseController<PermissionService> {
+    constructor() {
+        super(PermissionService)
+    }
 
     public findPermissions = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { from = 0, limit = 0, all = false, order = 'ASC' } = req.query
 
-            const [data, totalCount] = await this._permissionService.findAllPermissions(
+            const [data, totalCount] = await this._service.findAllPermissions(
                 Number(from),
                 Number(limit),
                 Boolean(all),
@@ -38,8 +38,11 @@ export class PermissionController {
     public findOnePermissionById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
+            const { deleted } = req.query
 
-            const data = await this._permissionService.findOnePermissionById(id)
+            const data = deleted
+                ? await this._service.findOnePermissionByIdIncludeDeleted(id)
+                : await this._service.findOnePermissionById(id)
 
             if (!data) return this._httpResponse.BadRequest(res, `There are no results for the id '${id}'`)
 
@@ -52,7 +55,7 @@ export class PermissionController {
 
     public createPermission = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const data = await this._permissionService.createPermission({ ...req.body })
+            const data = await this._service.createPermission({ ...req.body })
 
             return this._httpResponse.Created(res, data)
         } catch (error) {
@@ -65,7 +68,7 @@ export class PermissionController {
         try {
             const { id } = req.params
 
-            const data: UpdateResult = await this._permissionService.updatePermissionById(id, { ...req.body })
+            const data: UpdateResult = await this._service.updatePermissionById(id, { ...req.body })
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
 
@@ -78,11 +81,11 @@ export class PermissionController {
 
     public softDeletePermissionById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
+            const { idDisabled } = req.params
 
-            const data: DeleteResult = await this._permissionService.softDeletePermissionById(id)
+            const data: DeleteResult = await this._service.softDeletePermissionById(idDisabled)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${idDisabled}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
@@ -93,11 +96,11 @@ export class PermissionController {
 
     public restorePermissionById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
+            const { idRestore } = req.params
 
-            const data: UpdateResult = await this._permissionService.restorePermissionById(id)
+            const data: UpdateResult = await this._service.restorePermissionById(idRestore)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to restore the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to restore the id '${idRestore}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
@@ -108,10 +111,10 @@ export class PermissionController {
 
     public destroyPermissionById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
-            const data: DeleteResult = await this._permissionService.destroyPermissionById(id)
+            const { idDestroy } = req.params
+            const data: DeleteResult = await this._service.destroyPermissionById(idDestroy)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to destroy the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to destroy the id '${idDestroy}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {

@@ -2,8 +2,8 @@ import { Request, Response } from "express"
 import { DeleteResult, UpdateResult } from "typeorm";
 import { red } from 'colors';
 
-import { HttpResponse } from "../shared/response/http.response"
 import { UserService } from "../services"
+import { BaseController } from "../config";
 
 
 /**
@@ -12,17 +12,16 @@ import { UserService } from "../services"
  * 
  * @author Carlos Páez
  */
-export class UserController {
-    constructor(
-        private readonly _userService: UserService = new UserService(),
-        private readonly _httpResponse: HttpResponse = new HttpResponse()
-    ) { }
+export class UserController extends BaseController<UserService> {
+    constructor() {
+        super(UserService)
+    }
 
     public findUsers = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { from = 0, limit = 10, all = false, order = 'ASC' } = req.query
 
-            const [data, totalCount] = await this._userService.findUsers(
+            const [data, totalCount] = await this._service.findUsers(
                 Number(from),
                 Number(limit),
                 Boolean(all),
@@ -44,7 +43,11 @@ export class UserController {
     public findOneUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
-            const data = await this._userService.findOneUserById(id)
+            const { deleted } = req.query
+
+            const data = deleted
+                ? await this._service.findOneUserByIdIncludeDeleted(id)
+                : await this._service.findOneUserById(id)
 
             if (!data) return this._httpResponse.NotFound(res, `There are no results for the id '${id}'`)
 
@@ -57,7 +60,7 @@ export class UserController {
 
     public createUser = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const data = await this._userService.createUser({ ...req.body })
+            const data = await this._service.createUser({ ...req.body })
 
             return this._httpResponse.Created(res, data)
         } catch (error) {
@@ -70,7 +73,7 @@ export class UserController {
         try {
             const { id } = req.params
             const { email, username, password, ...infoUpdate } = req.body
-            const data: UpdateResult = await this._userService.updateUserById(id, { ...infoUpdate })
+            const data: UpdateResult = await this._service.updateUserById(id, { ...infoUpdate })
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
 
@@ -85,7 +88,7 @@ export class UserController {
         try {
             const { id } = req.params
             const { username } = req.body
-            const data: UpdateResult = await this._userService.updateUsernameById(id, username)
+            const data: UpdateResult = await this._service.updateUsernameById(id, username)
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
 
@@ -100,7 +103,7 @@ export class UserController {
         try {
             const { id } = req.params
             const { email } = req.body
-            const data: UpdateResult = await this._userService.updateEmailById(id, email)
+            const data: UpdateResult = await this._service.updateEmailById(id, email)
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
 
@@ -115,7 +118,7 @@ export class UserController {
         try {
             const { id } = req.params
             const { password } = req.body
-            const data: UpdateResult = await this._userService.updatePasswordById(id, password)
+            const data: UpdateResult = await this._service.updatePasswordById(id, password)
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
 
@@ -128,10 +131,10 @@ export class UserController {
 
     public softDeleteUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
-            const data: DeleteResult = await this._userService.softDeleteUserById(id)
+            const { idDisabled } = req.params
+            const data: DeleteResult = await this._service.softDeleteUserById(idDisabled)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${idDisabled}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
@@ -142,10 +145,10 @@ export class UserController {
 
     public restoreUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
-            const data: UpdateResult = await this._userService.restoreUserById(id)
+            const { idRestore } = req.params
+            const data: UpdateResult = await this._service.restoreUserById(idRestore)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to restore the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to restore the id '${idRestore}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
@@ -156,10 +159,10 @@ export class UserController {
 
     public destroyUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { id } = req.params
-            const data: DeleteResult = await this._userService.destroyUserById(id)
+            const { idDestroy } = req.params
+            const data: DeleteResult = await this._service.destroyUserById(idDestroy)
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to destroy the id '${id}'`)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to destroy the id '${idDestroy}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {

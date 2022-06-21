@@ -22,6 +22,13 @@ export class ModuleService extends BaseService<ModuleEntity> {
         return (await this.execRepository).findOneBy({ id })
     }
 
+    public async findOneModuleByIdIncludeDeleted(id: string): Promise<ModuleEntity | null> {
+        return (await this.execRepository).findOne({
+            where: { id },
+            withDeleted: true
+        })
+    }
+
     public async findOneModuleByName(moduleName: string): Promise<ModuleEntity | null> {
         return (await this.execRepository)
             .createQueryBuilder('module')
@@ -49,5 +56,12 @@ export class ModuleService extends BaseService<ModuleEntity> {
 
     public async destroyModuleById(id: string): Promise<DeleteResult> {
         return (await this.execRepository).delete(id)
+    }
+
+    public async moduleIsEnabled(id: string): Promise<ModuleEntity | null> {
+        return (await this.execRepository).findOne({
+            where: { id, deletedAt: undefined },
+            select: { id: true }
+        })
     }
 }
