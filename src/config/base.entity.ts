@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
 /**
@@ -10,9 +10,6 @@ import { Column, CreateDateColumn, DeleteDateColumn, PrimaryGeneratedColumn, Upd
 export abstract class BaseEntity {
     @PrimaryGeneratedColumn(`uuid`)
     id!: string
-
-    @Column({ nullable: false, type: "boolean", default: true })
-    status!: boolean
 
     @CreateDateColumn({
         name: `created_at`,

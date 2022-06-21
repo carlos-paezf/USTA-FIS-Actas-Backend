@@ -1,5 +1,6 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional } from "class-validator";
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, MaxLength, MinLength } from "class-validator";
 import { BaseDTO } from "../config";
+import { RoleEntity } from "../models";
 
 
 /** 
@@ -7,13 +8,13 @@ import { BaseDTO } from "../config";
  * 
  * @author Carlos Páez
  */
-export enum RoleType {
+export enum PositionType {
     DEAN = 'DEAN',
+    DEVELOPER = 'DEVELOPER',
     ADMINISTRATIVE = 'ADMINISTRATIVE',
     PROFESSOR = 'PROFESSOR',
-    GUEST = 'GUEST',
-    USER = 'USER',
-    DEVELOPER = 'DEVELOPER'
+    STUDENT = 'STUDENT',
+    GUEST = 'GUEST'
 }
 
 
@@ -31,6 +32,8 @@ export class UserDTO extends BaseDTO {
     lastName!: string
 
     @IsNotEmpty()
+    @MinLength(4)
+    @MaxLength(15)
     username!: string
 
     @IsEmail()
@@ -41,6 +44,9 @@ export class UserDTO extends BaseDTO {
     password!: string
 
     @IsOptional()
-    @IsEnum(RoleType)
-    role?: RoleType
+    @IsEnum(PositionType)
+    position?: PositionType
+
+    @IsOptional()
+    role?: RoleEntity
 }

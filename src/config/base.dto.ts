@@ -18,4 +18,8 @@ export abstract class BaseDTO {
     @IsDate()
     @IsOptional()
     updatedAt!: Date
+
+    @IsDate()
+    @IsOptional()
+    deletedAt!: Date
 }

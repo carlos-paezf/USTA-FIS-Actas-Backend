@@ -20,19 +20,18 @@ export class UserController {
 
     public findUsers = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const { from = 0, limit = 10, all = false, disabled = false, order = 'ASC' } = req.query
+            const { from = 0, limit = 10, all = false, order = 'ASC' } = req.query
 
             const [data, totalCount] = await this._userService.findUsers(
                 Number(from),
                 Number(limit),
                 Boolean(all),
-                Boolean(disabled),
                 String(order).toUpperCase()
             )
             if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the search`)
 
             return this._httpResponse.Ok(res, {
-                from, limit, all, disabled, order,
+                from, limit, all, order,
                 partialCount: data.length, totalCount,
                 data
             })
@@ -127,36 +126,6 @@ export class UserController {
         }
     }
 
-    public enableUserById = async (req: Request, res: Response): Promise<unknown> => {
-        try {
-            const { id } = req.params
-
-            const data: UpdateResult = await this._userService.enableUserById(id)
-
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
-
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:enableUserById: `), error)
-            return this._httpResponse.InternalServerError(res, error)
-        }
-    }
-
-    public disableUserById = async (req: Request, res: Response): Promise<unknown> => {
-        try {
-            const { id } = req.params
-
-            const data: UpdateResult = await this._userService.disableUserById(id)
-
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
-
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:disableUserById: `), error)
-            return this._httpResponse.InternalServerError(res, error)
-        }
-    }
-
     public softDeleteUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
@@ -167,6 +136,20 @@ export class UserController {
             return this._httpResponse.Ok(res, data)
         } catch (error) {
             console.log(red(`Error in UserController:deleteUser: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public restoreUserById = async (req: Request, res: Response): Promise<unknown> => {
+        try {
+            const { id } = req.params
+            const data: UpdateResult = await this._userService.restoreUserById(id)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to restore the id '${id}'`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in UserController:restoreUserById: `), error)
             return this._httpResponse.InternalServerError(res, error)
         }
     }

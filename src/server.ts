@@ -7,7 +7,7 @@ import { DataSource } from 'typeorm'
 import { blue, green, red } from 'colors'
 
 import { ConfigServer } from './config'
-import { UserRouter } from './routes'
+import { ModuleRouter, PermissionRouter, RoleRouter, UserRouter } from './routes'
 // import { loggerStream } from './helpers/logger.helper'
 
 
@@ -47,7 +47,10 @@ class ServerBootstrap extends ConfigServer {
      */
     private _routers = (): express.Router[] => {
         return [
-            new UserRouter().router
+            new UserRouter().router,
+            new RoleRouter().router,
+            new ModuleRouter().router,
+            new PermissionRouter().router
         ]
     }
 

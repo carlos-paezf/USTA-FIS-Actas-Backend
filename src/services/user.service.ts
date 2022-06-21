@@ -1,6 +1,6 @@
 import { UpdateResult, DeleteResult } from "typeorm";
 import { BaseService } from "../config";
-import { RoleType, UserDTO } from "../dtos";
+import { UserDTO } from "../dtos";
 import { PasswordEncrypter } from "../helpers/password-encrypter.helper";
 import { UserEntity } from "../models";
 
@@ -17,20 +17,48 @@ export class UserService extends BaseService<UserEntity> {
         super(UserEntity)
     }
 
-    public async findUsers(from: number, limit: number, all: boolean, disabled: boolean, order: string): Promise<[UserEntity[], number]> {
+    /**
+     * "Finds users from the database, and returns an array of users and the total number of users in
+     * the database."
+     * 
+     * The function takes in 4 parameters:
+     * 
+     * from: number - The starting point of the query.
+     * limit: number - The number of users to return.
+     * all: boolean - Whether to return all users or not.
+     * order: string - The order of the users to return.
+     * The function returns a promise that resolves to an array of users and the total number of users
+     * in the database
+     * @param {number} from - number - the number of records to skip
+     * @param {number} limit - number - the number of records to return
+     * @param {boolean} all - boolean - if true, it will return all users, including deleted ones.
+     * @param {string} order - string -&gt; ASC or DESC
+     * @returns An array of UserEntity and a number.
+     */
+    public async findUsers(from: number, limit: number, all: boolean, order: string): Promise<[UserEntity[], number]> {
         return (await this.execRepository).findAndCount({
             skip: from,
             take: limit,
             order: { username: (order === 'ASC') ? 'ASC' : 'DESC' },
-            where: disabled ? { status: false } : {},
-            withDeleted: all ? true : false
+            withDeleted: all ? true : false,
+            relations: { role: true }
         })
     }
 
+    /**
+     * Find one user by id
+     * @param {string} id - string
+     * @returns The user entity
+     */
     public async findOneUserById(id: string): Promise<UserEntity | null> {
         return (await this.execRepository).findOneBy({ id })
     }
 
+    /**
+     * Find a user by email, and return the user's password.
+     * @param {string} email - string - the email of the user
+     * @returns A UserEntity object with the password property.
+     */
     public async findUserByEmail(email: string): Promise<UserEntity | null> {
         return (await this.execRepository)
             .createQueryBuilder(`user`)
@@ -40,6 +68,11 @@ export class UserService extends BaseService<UserEntity> {
             .getOne()
     }
 
+    /**
+     * Find a user by username, and return the user's password.
+     * @param {string} username - string
+     * @returns A UserEntity object with the password property.
+     */
     public async findUserByUsername(username: string): Promise<UserEntity | null> {
         return (await this.execRepository)
             .createQueryBuilder(`user`)
@@ -49,14 +82,11 @@ export class UserService extends BaseService<UserEntity> {
             .getOne()
     }
 
-    public async findUserWithRole(id: string, role: RoleType): Promise<UserEntity | null> {
-        return (await this.execRepository)
-            .createQueryBuilder(`user`)
-            .where({ id })
-            .andWhere({ role })
-            .getOne()
-    }
-
+    /**
+     * It creates a new user, encrypts the password, and saves the user to the database.
+     * @param {UserDTO} body - UserDTO
+     * @returns The user object with the password hash.
+     */
     public async createUser(body: UserDTO): Promise<UserEntity> {
         const newUser = (await this.execRepository).create(body)
         const passwordHash = await PasswordEncrypter.encrypt(newUser.password)
@@ -64,35 +94,71 @@ export class UserService extends BaseService<UserEntity> {
         return (await this.execRepository).save(newUser)
     }
 
+    /**
+     * It updates the user by id.
+     * @param {string} id - string - the id of the user to be updated
+     * @param {UserDTO} infoUpdate - UserDTO
+     * @returns UpdateResult
+     */
     public async updateUserById(id: string, infoUpdate: UserDTO): Promise<UpdateResult> {
         return (await this.execRepository).update(id, { ...infoUpdate, updatedAt: new Date() })
     }
 
+    /**
+     * It updates the username of a user by id
+     * @param {string} id - string - the id of the user
+     * @param {string} username - string
+     * @returns UpdateResult
+     */
     public async updateUsernameById(id: string, username: string): Promise<UpdateResult> {
         return (await this.execRepository).update(id, { username, updatedAt: new Date() })
     }
 
+    /**
+     * Update the email of the user with the given id to the given email.
+     * @param {string} id - string - the id of the user
+     * @param {string} email - string
+     * @returns UpdateResult
+     */
     public async updateEmailById(id: string, email: string): Promise<UpdateResult> {
         return (await this.execRepository).update(id, { email, updatedAt: new Date() })
     }
 
+    /**
+     * Update the password of a user by id
+     * @param {string} id - string - the id of the user
+     * @param {string} password - string
+     * @returns UpdateResult
+     */
     public async updatePasswordById(id: string, password: string): Promise<UpdateResult> {
         const passwordHash = await PasswordEncrypter.encrypt(password)
         return (await this.execRepository).update(id, { password: passwordHash, updatedAt: new Date() })
     }
 
-    public async enableUserById(id: string): Promise<UpdateResult> {
-        return (await this.execRepository).update(id, { status: true, updatedAt: new Date() })
-    }
-
-    public async disableUserById(id: string): Promise<UpdateResult> {
-        return (await this.execRepository).update(id, { status: false, updatedAt: new Date() })
-    }
-
+    /**
+     * This function will return a promise that will resolve to a DeleteResult object, which will
+     * contain the number of rows affected by the delete operation.
+     * @param {string} id - string - the id of the user to be deleted
+     * @returns The DeleteResult is a class that is used to return the number of affected rows.
+     */
     public async softDeleteUserById(id: string): Promise<DeleteResult> {
         return (await this.execRepository).softDelete(id)
     }
 
+    /**
+     * Restore a user by id
+     * @param {string} id - string - the id of the user to be restored
+     * @returns UpdateResult
+     */
+    public async restoreUserById(id: string): Promise<UpdateResult> {
+        return (await this.execRepository).restore(id)
+    }
+
+    /**
+     * This function deletes a user from the database by their id.
+     * @param {string} id - string - The id of the user to delete
+     * @returns DeleteResult
+     */
     public async destroyUserById(id: string): Promise<DeleteResult> {
         return (await this.execRepository).delete({ id })
     }
