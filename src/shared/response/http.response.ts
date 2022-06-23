@@ -118,6 +118,15 @@ export class HttpResponse {
         })
     }
 
+    /**
+     * It takes a response object and an optional data object, and returns a response object with a
+     * status of 412 and a JSON object with a status, statusMsg, and error property
+     * @param {Response} res - Response - This is the response object that is passed to the controller
+     * method.
+     * @param {unknown} [data] - The data you want to send back to the client.
+     * @returns A response object with a status of 412 and a json object with the status, statusMsg,
+     * and error.
+     */
     public PreconditionFailed(res: Response, data?: unknown): Response<unknown> {
         return res.status(HttpStatus.PRECONDITION_FAILED).json({
             status: HttpStatus.PRECONDITION_FAILED,

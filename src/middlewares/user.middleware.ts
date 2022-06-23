@@ -2,12 +2,12 @@ import { validate } from "class-validator";
 import { red } from "colors";
 import { NextFunction, Request, Response } from "express";
 
-import { UserDTO } from "../dtos";
 import { CustomFieldsHelper } from "../helpers/custom-fields.helper";
-import { UserService } from "../services";
+import { RoleService, UserService } from "../services";
 import { SharedMiddleware } from '../shared/middlewares/shared.middleware';
 
 
+const _roleService = new RoleService()
 /**
  * It validates the user's input and if there are errors, 
  * it returns a bad request response 
@@ -84,18 +84,40 @@ export class UserMiddleware extends SharedMiddleware<UserService> {
     }
 
     /**
-     * It validates the email and username fields of the request body and returns a 400 response if there
+     * It validates the email field of the request body and returns a 400 response if there
      * are errors.
      * @param {Request} req - Request - The request object
      * @param {Response} res - Response - The response object
      * @param {NextFunction} next - NextFunction -&gt; This is a function that will be called to pass the
      * request to the next middleware in line.
      */
-    public customFieldsValidator = (req: Request, res: Response, next: NextFunction) => {
-        const { email, username } = req.body
+    public updateEmailValidator = (req: Request, res: Response, next: NextFunction) => {
+        const { email } = req.body
+        if (!email) return this.httpResponse.PreconditionFailed(res, `No email provided`)
+
         const valid = new CustomFieldsHelper()
 
         valid.email = email
+
+        validate(valid).then((error) => {
+            return error.length ? this.httpResponse.PreconditionFailed(res, error) : next()
+        })
+    }
+
+    /**
+     * It validates the username field of the request body and returns a 400 response if there
+     * are errors.
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response - The response object
+     * @param {NextFunction} next - NextFunction -&gt; This is a function that will be called to pass the
+     * request to the next middleware in line.
+     */
+    public updateUsernameValidator = (req: Request, res: Response, next: NextFunction) => {
+        const { username } = req.body
+        if (!username) return this.httpResponse.PreconditionFailed(res, `No username provided`)
+
+        const valid = new CustomFieldsHelper()
+
         valid.username = username
 
         validate(valid).then((error) => {
@@ -104,45 +126,21 @@ export class UserMiddleware extends SharedMiddleware<UserService> {
     }
 
     /**
-     * If the username or email is already being used, return a bad request response, otherwise, continue
-     * to the next middleware.
+     * It validates the role field of the request body and returns a 400 response if there
+     * are errors.
      * @param {Request} req - Request - The request object
      * @param {Response} res - Response - The response object
-     * @param {NextFunction} next - NextFunction - The next middleware function in the stack.
-     * @returns The return value of the next() function.
+     * @param {NextFunction} next - NextFunction -&gt; This is a function that will be called to pass the
+     * request to the next middleware in line.
      */
-    public usernameAndEmailValidator = async (req: Request, res: Response, next: NextFunction) => {
-        const { username, email } = req.body
-        const userByUsername = await this._service.findUserByUsername(username.toUpperCase())
-        const userByEmail = await this._service.findUserByEmail(email.toUpperCase())
+    public updateRoleValidator = async (req: Request, res: Response, next: NextFunction) => {
+        const { role } = req.body
+        if (!role) return this.httpResponse.PreconditionFailed(res, `No role provided`)
 
-        if (userByUsername) {
-            return this.httpResponse.BadRequest(res, `The username '${username}' is already being used`)
-        }
-        if (userByEmail) {
-            return this.httpResponse.BadRequest(res, `The email '${email}' is already being used`)
-        }
+        const roleQuery = await _roleService.findOneRoleById(role)
+        if (!roleQuery) return this.httpResponse.BadRequest(res, `There is no role with the id '${role}'`)
 
-        return next()
-    }
-
-    /**
-     * It validates the user's input and if there are errors, it returns a bad request response.
-     * @param {Request} req - Request - The request object
-     * @param {Response} res - Response - Express response object
-     * @param {NextFunction} next - NextFunction - The next middleware function in the stack.
-     */
-    public userValidator = (req: Request, res: Response, next: NextFunction) => {
-        const { name, lastName, username, email, password, position, role } = req.body
-
-        const valid = new UserDTO()
-
-        valid.name = name
-        valid.lastName = lastName
-        valid.username = username
-        valid.email = email
-        valid.password = password
-        valid.position = position
+        const valid = new CustomFieldsHelper()
         valid.role = role
 
         validate(valid).then((error) => {

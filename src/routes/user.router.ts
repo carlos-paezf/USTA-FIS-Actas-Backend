@@ -1,5 +1,6 @@
 import { BaseRouter } from "../config";
 import { UserController } from "../controllers";
+import { ModulesID, PermissionsID } from "../helpers/enums.helper";
 import { UserMiddleware } from "../middlewares";
 
 
@@ -18,6 +19,8 @@ export class UserRouter extends BaseRouter<UserController, UserMiddleware> {
         this.router.post(
             '/users',
             [
+                this.middleware.validateJWT,
+                this.middleware.checkRoleModulePermission(ModulesID.USERS, PermissionsID.CREATE),
                 this.middleware.usernameAndEmailValidator,
                 this.middleware.validateRoleIsEnabled,
                 this.middleware.userValidator
@@ -33,14 +36,20 @@ export class UserRouter extends BaseRouter<UserController, UserMiddleware> {
 
         this.router.patch(
             '/users/update-username/:id',
-            [this.middleware.usernameAndEmailValidator, this.middleware.customFieldsValidator],
+            [this.middleware.usernameAndEmailValidator, this.middleware.updateUsernameValidator],
             this.controller.updateUsernameById
         )
 
         this.router.patch(
             '/users/update-email/:id',
-            [this.middleware.usernameAndEmailValidator, this.middleware.customFieldsValidator],
+            [this.middleware.usernameAndEmailValidator, this.middleware.updateEmailValidator],
             this.controller.updateEmailById
+        )
+
+        this.router.patch(
+            '/users/update-role/:id',
+            [this.middleware.updateRoleValidator],
+            this.controller.updateUserRoleById
         )
 
         this.router.patch('/users/update-password/:id', this.controller.updatePasswordById)

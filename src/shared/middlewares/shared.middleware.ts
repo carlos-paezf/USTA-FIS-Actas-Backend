@@ -1,38 +1,34 @@
 import { red } from 'colors';
 import { NextFunction, Request, Response } from 'express';
-import { ModuleService, PermissionService, RoleService } from '../../services';
-import { HttpResponse } from '../response/http.response';
+
+import { ModuleService, PermissionService } from '../../services';
+import { AuthMiddleware } from './auth.middleware';
 
 
-export class SharedMiddleware<T> {
+const _moduleService: ModuleService = new ModuleService()
+const _permissionService: PermissionService = new PermissionService()
+
+
+export class SharedMiddleware<T> extends AuthMiddleware {
     protected _service: T
 
-    constructor(TService: { new(): T }, protected readonly httpResponse: HttpResponse = new HttpResponse()) {
+    constructor(TService: { new(): T }) {
+        super()
         this._service = new TService()
     }
 
-    private readonly _roleService: RoleService = new RoleService()
-    private readonly _moduleService: ModuleService = new ModuleService()
-    private readonly _permissionService: PermissionService = new PermissionService()
-
-    public validateRoleIsEnabled = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const { role } = req.body
-            const roleEnabled = await this._roleService.roleIsEnabled(role)
-
-            return (!roleEnabled)
-                ? this.httpResponse.PreconditionFailed(res, `Role with id ${role} is disabled or has been removed`)
-                : next()
-        } catch (error) {
-            console.log(red(`Error in SharedMiddleware:validateRoleIsEnabled: `), error)
-            return this.httpResponse.InternalServerError(res, error)
-        }
-    }
-
+    /**
+     * If the module is not enabled, return a precondition failed response, otherwise, call the next function
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response - this is the response object that is passed to the middleware
+     * @param {NextFunction} next - NextFunction -&gt; This is a function that is used to call the next
+     * middleware in the chain.
+     * @returns the result of the next() function.
+     */
     public validateModuleIsEnabled = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { module } = req.body
-            const moduleEnabled = await this._moduleService.moduleIsEnabled(module)
+            const moduleEnabled = await _moduleService.moduleIsEnabled(module)
 
             return (!moduleEnabled)
                 ? this.httpResponse.PreconditionFailed(res, `Module with id ${module} is disabled or has been removed`)
@@ -43,10 +39,18 @@ export class SharedMiddleware<T> {
         }
     }
 
+    /**
+     * If the permission is not enabled, return a precondition failed response, otherwise, call the next function
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response - this is the response object that is passed to the middleware
+     * @param {NextFunction} next - NextFunction -&gt; This is a function that is used to call the next
+     * middleware in the chain.
+     * @returns the result of the next() function.
+     */
     public validatePermissionIsEnabled = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { permission } = req.body
-            const permissionEnabled = await this._permissionService.permissionIsEnabled(permission)
+            const permissionEnabled = await _permissionService.permissionIsEnabled(permission)
 
             return (!permissionEnabled)
                 ? this.httpResponse.PreconditionFailed(res, `Permission with id ${permission} is disabled or has been removed`)

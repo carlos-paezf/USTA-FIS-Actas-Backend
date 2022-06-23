@@ -8,6 +8,7 @@ import { blue, green, red } from 'colors'
 
 import { ConfigServer } from './config'
 import { ModuleRouter, PermissionRouter, RoleModulePermissionRouter, RoleRouter, UserRouter } from './routes'
+import { AuthRouter } from './auth/router/auth.router'
 // import { loggerStream } from './helpers/logger.helper'
 
 
@@ -23,20 +24,20 @@ class ServerBootstrap extends ConfigServer {
 
         this._app.use(express.json())
         this._app.use(express.urlencoded({ extended: true }))
-        this._app.use(cors())
         /* this._app.use(morgan(
             ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :req[header] :res[content-type]',
             {
                 skip: function (req, res) { return res.statusCode < 400 },
                 stream: loggerStream
             }
-        )) */
+            )) */
         this._app.use(morgan('common'))
+        this._app.use(cors())
 
-        this._passportUse()
         this._dbConnect()
 
-        this._app.use('/api/', this._routers())
+        this._app.use('/auth/', new AuthRouter().router)
+        this._app.use('/api/v1/', this._routers())
 
         this._listen()
     }
@@ -47,16 +48,13 @@ class ServerBootstrap extends ConfigServer {
      */
     private _routers = (): express.Router[] => {
         return [
+            new AuthRouter().router,
             new UserRouter().router,
             new RoleRouter().router,
             new ModuleRouter().router,
             new PermissionRouter().router,
             new RoleModulePermissionRouter().router
         ]
-    }
-
-    private _passportUse = () => {
-        return []
     }
 
     /** 

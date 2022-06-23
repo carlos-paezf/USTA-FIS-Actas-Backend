@@ -28,4 +28,7 @@ const Config: DataSourceOptions = {
 }
 
 
+/**
+ * Creating a new instance of the DataSource class and passing in the Config object.
+ */
 export const AppDataSource: DataSource = new DataSource(Config)

@@ -1,7 +1,6 @@
 import { Exclude } from "class-transformer";
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { BaseEntity } from "../config";
-import { PositionType } from "../dtos";
 import { RoleEntity } from "./role.entity";
 
 
@@ -30,8 +29,8 @@ export class UserEntity extends BaseEntity {
     @Column({ select: false, nullable: false })
     password!: string
 
-    @Column({ type: 'enum', enum: PositionType, nullable: false, default: PositionType.PROFESSOR })
-    position!: PositionType
+    @Column()
+    position!: string
 
     @ManyToOne(() => RoleEntity, (role) => role.users)
     @JoinColumn({ name: 'role_id' })

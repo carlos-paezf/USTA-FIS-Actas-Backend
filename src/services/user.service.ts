@@ -2,7 +2,7 @@ import { UpdateResult, DeleteResult } from "typeorm";
 import { BaseService } from "../config";
 import { UserDTO } from "../dtos";
 import { PasswordEncrypter } from "../helpers/password-encrypter.helper";
-import { UserEntity } from "../models";
+import { RoleEntity, UserEntity } from "../models";
 
 
 /**
@@ -51,7 +51,10 @@ export class UserService extends BaseService<UserEntity> {
      * @returns The user entity
      */
     public async findOneUserById(id: string): Promise<UserEntity | null> {
-        return (await this.execRepository).findOneBy({ id })
+        return (await this.execRepository).findOne({
+            where: { id },
+            relations: { role: true }
+        })
     }
 
     /**
@@ -62,7 +65,8 @@ export class UserService extends BaseService<UserEntity> {
     public async findOneUserByIdIncludeDeleted(id: string): Promise<UserEntity | null> {
         return (await this.execRepository).findOne({
             where: { id },
-            withDeleted: true
+            withDeleted: true,
+            relations: { role: true }
         })
     }
 
@@ -72,12 +76,10 @@ export class UserService extends BaseService<UserEntity> {
      * @returns A UserEntity object with the password property.
      */
     public async findUserByEmail(email: string): Promise<UserEntity | null> {
-        return (await this.execRepository)
-            .createQueryBuilder(`user`)
-            .addSelect(`user.password`)
-            .where({ email })
-            .withDeleted()
-            .getOne()
+        return (await this.execRepository).findOne({
+            where: { email },
+            select: { id: true, password: true }
+        })
     }
 
     /**
@@ -86,12 +88,10 @@ export class UserService extends BaseService<UserEntity> {
      * @returns A UserEntity object with the password property.
      */
     public async findUserByUsername(username: string): Promise<UserEntity | null> {
-        return (await this.execRepository)
-            .createQueryBuilder(`user`)
-            .addSelect(`user.password`)
-            .where({ username })
-            .withDeleted()
-            .getOne()
+        return (await this.execRepository).findOne({
+            where: { username },
+            select: { id: true, password: true }
+        })
     }
 
     /**
@@ -134,6 +134,16 @@ export class UserService extends BaseService<UserEntity> {
      */
     public async updateEmailById(id: string, email: string): Promise<UpdateResult> {
         return (await this.execRepository).update(id, { email, updatedAt: new Date() })
+    }
+
+    /**
+     * Update the role of the user with the given id to the given email.
+     * @param {string} id - string - the id of the user
+     * @param {string} email - string
+     * @returns UpdateResult
+     */
+    public async updateUserRoleById(id: string, role: RoleEntity): Promise<UpdateResult> {
+        return (await this.execRepository).update(id, { role, updatedAt: new Date() })
     }
 
     /**

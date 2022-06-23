@@ -4,6 +4,7 @@ import { red } from 'colors';
 
 import { UserService } from "../services"
 import { BaseController } from "../config";
+import { RolesID } from "../helpers/enums.helper";
 
 
 /**
@@ -17,6 +18,13 @@ export class UserController extends BaseController<UserService> {
         super(UserService)
     }
 
+    /**
+     * Method to obtain registered users in the database
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns An object with the sent values of from, limit, all, order, the number of 
+     * records returned by the query, the total number of records, and the array of users
+     */
     public findUsers = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { from = 0, limit = 10, all = false, order = 'ASC' } = req.query
@@ -40,6 +48,12 @@ export class UserController extends BaseController<UserService> {
         }
     }
 
+    /**
+     * Find a user by its id (records that were deleted with soft-delete can also be obtained)
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns The user record that matches the id
+     */
     public findOneUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
@@ -58,9 +72,18 @@ export class UserController extends BaseController<UserService> {
         }
     }
 
+    /**
+     * Adding a user to the database
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns An object with the embedded information
+     */
     public createUser = async (req: Request, res: Response): Promise<unknown> => {
         try {
-            const data = await this._service.createUser({ ...req.body })
+            const user = req.body
+            user.role = user.role ?? RolesID.GUEST
+
+            const data = await this._service.createUser({ ...user })
 
             return this._httpResponse.Created(res, data)
         } catch (error) {
@@ -69,10 +92,16 @@ export class UserController extends BaseController<UserService> {
         }
     }
 
+    /**
+     * Update a user by their id, except for the `email`, `username`, and `password` fields
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns An object with the number of affected rows
+     */
     public updateUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
-            const { email, username, password, ...infoUpdate } = req.body
+            const { email, username, password, role, ...infoUpdate } = req.body
             const data: UpdateResult = await this._service.updateUserById(id, { ...infoUpdate })
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
@@ -84,6 +113,12 @@ export class UserController extends BaseController<UserService> {
         }
     }
 
+    /**
+     * Update the `username` field of the user that matches the id
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns An object with the number of affected rows
+     */
     public updateUsernameById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
@@ -99,6 +134,12 @@ export class UserController extends BaseController<UserService> {
         }
     }
 
+    /**
+     * Update the `email` field of the user that matches the id
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns An object with the number of affected rows
+     */
     public updateEmailById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
@@ -109,11 +150,38 @@ export class UserController extends BaseController<UserService> {
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {
-            console.log(red(`Error in UserController:updateEmail: `), error)
+            console.log(red(`Error in UserController:updateEmailById: `), error)
             return this._httpResponse.InternalServerError(res, error)
         }
     }
 
+    /**
+     * Update the `rol` field of the user that matches the id
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns An object with the number of affected rows
+     */
+    public updateUserRoleById = async (req: Request, res: Response): Promise<unknown> => {
+        try {
+            const { id } = req.params
+            const { role } = req.body
+            const data: UpdateResult = await this._service.updateUserRoleById(id, role)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in UserController:updateUserRoleById: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    /**
+     * Update the `password` field of the user that matches the id
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns An object with the number of affected rows
+     */
     public updatePasswordById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { id } = req.params
@@ -129,6 +197,12 @@ export class UserController extends BaseController<UserService> {
         }
     }
 
+    /**
+     * Logically delete a user record by its id, in order to maintain referential integrity
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns An object with the number of affected rows
+     */
     public softDeleteUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { idDisabled } = req.params
@@ -143,6 +217,12 @@ export class UserController extends BaseController<UserService> {
         }
     }
 
+    /**
+     * Restore a user record that has been marked as deleted
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns An object with the number of affected rows
+     */
     public restoreUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { idRestore } = req.params
@@ -157,6 +237,12 @@ export class UserController extends BaseController<UserService> {
         }
     }
 
+    /**
+     * Destroy a record beyond restoration
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response =&gt; Express Response object
+     * @returns An object with the number of affected rows
+     */
     public destroyUserById = async (req: Request, res: Response): Promise<unknown> => {
         try {
             const { idDestroy } = req.params
