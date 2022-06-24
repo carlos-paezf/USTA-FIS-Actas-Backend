@@ -60,7 +60,7 @@
         "typeorm": "typeorm-ts-node-esm -d ./src/config/data.config.ts",
         "m:gen": "npm run typeorm migration:generate",
         "m:run": "npm run typeorm migration:run",
-        "docker": "docker-compose up -d"
+        "docker-compose": "docker-compose up -d"
     },
   }
   ```
@@ -68,7 +68,7 @@
 - Levantar contenedor con la base de datos
 
   ```txt
-  pnpm docker
+  pnpm docker-compose
   ```
 
 - Levantar el proyecto en modo desarrollo

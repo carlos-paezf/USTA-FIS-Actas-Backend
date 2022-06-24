@@ -20,5 +20,13 @@ export class AuthRouter extends BaseRouter<AuthController, AuthMiddleware> {
             ],
             this.controller.register
         )
+
+        this.router.post(
+            '/renew-token',
+            [
+                this.middleware.validateJWT
+            ],
+            this.controller.renewToken
+        )
     }
 }

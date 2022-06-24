@@ -23,12 +23,16 @@ export class RoleModulePermissionService extends BaseService<RoleModulePermissio
     }
 
     public async findOneRoleModulePermissionById(id: string): Promise<RoleModulePermissionEntity | null> {
-        return (await this.execRepository).findOneBy({ id })
+        return (await this.execRepository).findOne({
+            where: { id },
+            relations: { role: true, module: true, permission: true }
+        })
     }
 
     public async findOneRoleModulePermissionByIdIncludeDeleted(id: string): Promise<RoleModulePermissionEntity | null> {
         return (await this.execRepository).findOne({
             where: { id },
+            relations: { role: true, module: true, permission: true },
             withDeleted: true
         })
     }
@@ -63,10 +67,15 @@ export class RoleModulePermissionService extends BaseService<RoleModulePermissio
     public async validateRoleModulePermissionForJWT(roleId: string, moduleId: string, permissionId: string): Promise<RoleModulePermissionEntity | null> {
         return (await this.execRepository)
             .createQueryBuilder('roleModulePermission')
-            .where(`roleModulePermission.role = :roleId`, { roleId })
-            .where(`roleModulePermission.module = :moduleId`, { moduleId })
-            .where(`roleModulePermission.permission = :permissionId`, { permissionId })
-            .select(`roleModulePermission.id`)
+            .where('roleModulePermission.role = :roleId', { roleId })
+            .andWhere('roleModulePermission.module = :moduleId', { moduleId })
+            .andWhere('roleModulePermission.permission = :permissionId', { permissionId })
+            .leftJoin('roleModulePermission.role', 'role', 'role.id = :roleId', { roleId })
+            // .leftJoinAndSelect('roleModulePermission.role', 'role', 'role.id = :roleId', { roleId })
+            .leftJoin('roleModulePermission.module', 'module', 'module.id = :moduleId', { moduleId })
+            // .leftJoinAndSelect('roleModulePermission.module', 'module', 'module.id = :moduleId', { moduleId })
+            .leftJoin('roleModulePermission.permission', 'permission', 'permission.id = :permissionId', { permissionId })
+            // .leftJoinAndSelect('roleModulePermission.permission', 'permission', 'permission.id = :permissionId', { permissionId })
             .getOne()
     }
 }

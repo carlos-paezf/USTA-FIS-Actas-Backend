@@ -16,33 +16,6 @@ export class AuthController extends AuthService {
     }
 
     /**
-     * This function saves the user and JWT in the request.
-     * @param {UserEntity} user - UserEntity =&gt; UserEntity is a class that extends the User class from
-     * the typeorm library
-     * @param {Request} req - Request =&gt; is the request object
-     * @param {Response} res - Response
-     * @returns the result of the function call.
-     */
-    private _saveUserAndJWTInRequest = async (user: UserEntity, req: Request, res: Response) => {
-        try {
-            const encode = await this.generateJWT(user.id)
-            if (!encode) return this._httpResponse.Unauthorized(res, `You do not have permission to access`)
-
-            req.user = encode.user
-
-            req.header('Au')
-
-            res.header('Content-Type', 'application/json')
-            res.cookie('accesToken', encode.accessToken, { maxAge: 10800000 })
-            res.write(JSON.stringify(encode))
-            res.end()
-        } catch (error) {
-            console.log(red(`Error in AuthController:_saveUserAndJWTInRequest: `), error)
-            return this._httpResponse.InternalServerError(res, error)
-        }
-    }
-
-    /**
      * It takes a user object, generates a JWT, and then sets the JWT as a cookie on the response
      * object.
      * @param {Request} req - Request - The request object
@@ -56,7 +29,10 @@ export class AuthController extends AuthService {
             const user = await this.validateUser(emailOrUsername, req.body.password)
             if (!user) return this._httpResponse.BadRequest(res, `Invalid email/username or password`)
 
-            return await this._saveUserAndJWTInRequest(user, req, res)
+            const encode = await this.generateJWT(user.id)
+            if (!encode) return this._httpResponse.Unauthorized(res, `You do not have permission to access`)
+
+            return this._httpResponse.Ok(res, encode)
         } catch (error) {
             console.log(red(`Error in AuthController:login: `), error)
             return this._httpResponse.InternalServerError(res, error)
@@ -77,11 +53,12 @@ export class AuthController extends AuthService {
 
             const user = await _userService.createUser({ ...data })
 
-            this._httpResponse.Created(res, user)
+            const encode = await this.generateJWT(user.id)
+            if (!encode) return this._httpResponse.Unauthorized(res, `You do not have permission to access`)
 
             // TODO: Emitir un socket para alertar la creación de un usuario, y lograr cambiar su rol en caso necesario
 
-            return await this._saveUserAndJWTInRequest(user, req, res)
+            return this._httpResponse.Created(res, encode)
         } catch (error) {
             console.log(red(`Error in AuthController:register: `), error)
             return this._httpResponse.InternalServerError(res, error)
@@ -99,7 +76,10 @@ export class AuthController extends AuthService {
             const user = req.user as UserEntity
             if (!user) return this._httpResponse.NotFound(res, `No user found in the request`)
 
-            return await this._saveUserAndJWTInRequest(user, req, res)
+            const encode = await this.generateJWT(user.id)
+            if (!encode) return this._httpResponse.Unauthorized(res, `You do not have permission to access`)
+
+            return this._httpResponse.Ok(res, encode)
         } catch (error) {
             console.log(red(`Error un AuthController:renewToken`), error)
             return this._httpResponse.InternalServerError(res, error)

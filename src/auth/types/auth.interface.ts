@@ -1,7 +1,10 @@
-export interface PayloadToken {
+export interface TokenPayload {
     id: string,
     email: string,
     username: string,
-    role: string,
-    roleName: string
+    role: {
+        id: string,
+        roleName: string,
+        deletedAt: Date | null
+    }
 }

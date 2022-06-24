@@ -1,3 +1,6 @@
+/* ---------------------------------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------ Inserción de datos básicos ------------------------------------------------ */
+/* ---------------------------------------------------------------------------------------------------------------------------- */
 /* --------------------------------------------------------------- */
 /* Inserción para Roles */
 /* --------------------------------------------------------------- */
@@ -127,6 +130,18 @@ VALUES (
         'MINUTES OF MEETING',
         'Meeting Minutes Management Module'
     );
+INSERT INTO `modules` (`id`, `module_name`, `module_description`)
+VALUES (
+        'roles-modules-permissions',
+        'ROLES MODULES PERMISSIONS',
+        'Module permissions on modules by role'
+    );
+INSERT INTO `modules` (`id`, `module_name`, `module_description`)
+VALUES (
+        'modules',
+        'MODULES',
+        'Module'
+    );
 /* --------------------------------------------------------------- */
 /* Inserción para Roles */
 /* --------------------------------------------------------------- */
@@ -181,42 +196,126 @@ INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permissi
 VALUES (
         uuid(),
         'developer',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'create'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'developer',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'read'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'developer',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'update'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'developer',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'soft-delete'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'developer',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'restore'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'developer',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
+        'hard-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'roles-modules-permissions',
+        'create'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'roles-modules-permissions',
+        'read'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'roles-modules-permissions',
+        'update'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'roles-modules-permissions',
+        'soft-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'roles-modules-permissions',
+        'restore'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'roles-modules-permissions',
+        'hard-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'modules',
+        'create'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'modules',
+        'read'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'modules',
+        'update'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'modules',
+        'soft-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'modules',
+        'restore'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'modules',
         'hard-delete'
     );
 -- Permisos para decano(a)
@@ -257,25 +356,109 @@ VALUES (uuid(), 'dean', 'permissions', 'restore');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'dean', 'permissions', 'hard-delete');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'dean', 'minutes-od-meeting', 'create');
+VALUES (uuid(), 'dean', 'minutes-of-meeting', 'create');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'dean', 'minutes-od-meeting', 'read');
+VALUES (uuid(), 'dean', 'minutes-of-meeting', 'read');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'dean', 'minutes-od-meeting', 'update');
+VALUES (uuid(), 'dean', 'minutes-of-meeting', 'update');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'dean',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'soft-delete'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'dean', 'minutes-od-meeting', 'restore');
+VALUES (uuid(), 'dean', 'minutes-of-meeting', 'restore');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'dean',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
+        'hard-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'roles-modules-permissions',
+        'create'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'roles-modules-permissions',
+        'read'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'roles-modules-permissions',
+        'update'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'roles-modules-permissions',
+        'soft-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'roles-modules-permissions',
+        'restore'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'roles-modules-permissions',
+        'hard-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'modules',
+        'create'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'modules',
+        'read'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'modules',
+        'update'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'modules',
+        'soft-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'modules',
+        'restore'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'modules',
         'hard-delete'
     );
 -- Permisos para docente
@@ -291,28 +474,28 @@ INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permissi
 VALUES (
         uuid(),
         'professor',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'create'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'professor',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'read'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'professor',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'update'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'professor',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'soft-delete'
     );
 -- Permisos para administrativo
@@ -322,14 +505,47 @@ INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permissi
 VALUES (
         uuid(),
         'administrative',
-        'minutes-od-meeting',
+        'minutes-of-meeting',
         'read'
     );
 -- Permisos para desarrollador
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'student', 'users', 'read');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'student', 'minutes-od-meeting', 'read');
+VALUES (uuid(), 'student', 'minutes-of-meeting', 'read');
 -- Permisos para invitado
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'guest', 'minutes-od-meeting', 'read');
+VALUES (uuid(), 'guest', 'minutes-of-meeting', 'read');
+/* --------------------------------------------------------------- */
+/* Inserción para Desarrollador por defecto */
+/* --------------------------------------------------------------- */
+INSERT INTO `users`(
+        `id`,
+        `created_at`,
+        `updated_at`,
+        `deleted_at`,
+        `name`,
+        `last_name`,
+        `username`,
+        `email`,
+        `password`,
+        `position`,
+        `role_id`
+    )
+VALUES (
+        uuid(),
+        DEFAULT,
+        DEFAULT,
+        DEFAULT,
+        "Carlos David",
+        "Páez Ferreira",
+        "carlos-paezf",
+        "carlos-paezf@usantoto.edu.co",
+        "$2b$10$dSbyYv5ok9VBipMkTy7tDOXF5ZeIQCkygOzmiO3o0nl6VkyLH5/qG",
+        --developer1234567890
+        "Desarrollador",
+        "developer"
+    );
+/* 
+ INSERT INTO `users`(`id`, `created_at`, `updated_at`, `deleted_at`, `name`, `last_name`, `username`, `email`, `password`, `position`, `role_id`) VALUES (?, DEFAULT, DEFAULT, DEFAULT, ?, ?, ?, ?, ?, ?, ?) -- PARAMETERS: ["8a4e6986-7dde-46d2-96a4-bdf92af02e1f","Carlos David","Páez Ferreira","carlos-paezf","carlos-paezf@usantoto.edu.co","$2b$10$dSbyYv5ok9VBipMkTy7tDOXF5ZeIQCkygOzmiO3o0nl6VkyLH5/qG","Desarrollador","guest"]
+ */

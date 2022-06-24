@@ -4,7 +4,7 @@ import { compare } from "bcrypt";
 import { ConfigServer } from "../../config";
 import { UserEntity } from "../../models";
 import { UserService } from '../../services';
-import { PayloadToken } from "../types/auth.interface";
+import { TokenPayload } from "../types/auth.interface";
 
 
 export class AuthService extends ConfigServer {
@@ -44,7 +44,13 @@ export class AuthService extends ConfigServer {
      * @param {string} secret - The secret key used to sign the token.
      * @returns A JWT token
      */
-    private _sign(payload: jwt.JwtPayload, secret: string, options = { expiresIn: `3h` }): string {
+    private _sign(
+        payload: jwt.JwtPayload,
+        secret: string,
+        options: jwt.SignOptions = {
+            expiresIn: `3h`,
+            algorithm: 'HS256'
+        }): string {
         return this._jwtInstance.sign(payload, secret, options)
     }
 
@@ -60,21 +66,43 @@ export class AuthService extends ConfigServer {
         if (!user) return null
         else user.password = 'Not Permission'
 
-        const payload: PayloadToken = {
+        const payload: TokenPayload = {
             id: user.id,
             email: user.email,
             username: user.username,
-            role: user.role.id,
-            roleName: user.role.roleName
+            role: {
+                id: user.role.id,
+                roleName: user.role.roleName,
+                deletedAt: user.role.deletedAt
+            }
         }
-
+        /*eslint-disable */
         return {
             accessToken: this._sign(payload, this.getEnvironment(`JWT_SECRET_KEY`)!),
             user
         }
+        /*eslint-disable */
     }
 
-    public verifyJWT(token: string) {
-        return jwt.verify(token, this.getEnvironment(`JWT_SECRET_KEY`)!)
+    /**
+     * It takes a token, verifies it, and returns a promise that resolves to the decoded token payload
+     * @param {string} token - The token to verify
+     * @returns The decoded token payload.
+     */
+    public verifyJWT(token: string): Promise<TokenPayload> {
+        const verifyOptions: jwt.VerifyOptions = {
+            algorithms: ['HS256'],
+        }
+
+        return new Promise((resolve, reject) => {
+            jwt.verify(
+                token,
+                this.getEnvironment(`JWT_SECRET_KEY`)!,
+                verifyOptions,
+                (error, decoded) => {
+                    return (error) ? reject(error) : resolve(decoded as TokenPayload)
+                }
+            )
+        })
     }
 }

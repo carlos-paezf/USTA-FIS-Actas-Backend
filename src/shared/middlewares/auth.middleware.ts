@@ -9,7 +9,7 @@ import { UserDTO } from '../../dtos';
 import { validate } from 'class-validator';
 import { red } from 'colors';
 import { AuthService } from '../../auth/services/auth.service';
-import { PayloadToken } from '../../auth/types/auth.interface';
+import { TokenPayload } from '../../auth/types/auth.interface';
 
 
 const _authService: AuthService = new AuthService()
@@ -63,15 +63,20 @@ export class AuthMiddleware {
         async (req: Request, res: Response, next: NextFunction) => {
             try {
                 const user = req.user as UserEntity
-                console.log(user)
+
+                if (user.role.deletedAt !== null) {
+                    return this.httpResponse.Unauthorized(res, `You do not have permission to access`)
+                }
 
                 const userQuery = await _roleModulePermissionService.validateRoleModulePermissionForJWT(user.role.id, moduleId, permissionId)
 
-                return (!userQuery)
-                    ? this.httpResponse.Unauthorized(res, `You do not have permission to access`)
-                    : next()
+                if (!userQuery) {
+                    return this.httpResponse.Unauthorized(res, `You do not have permission to access`)
+                }
+
+                next()
             } catch (error) {
-                console.log(red(`Error un AuthMiddleware: validateJWT: `), error)
+                console.log(red(`Error un AuthMiddleware:checkRoleModulePermission: `), error)
                 return this.httpResponse.InternalServerError(res, error)
             }
         }
@@ -88,6 +93,8 @@ export class AuthMiddleware {
      */
     public checkAdminRole = async (req: Request, res: Response, next: NextFunction) => {
         const user = req.user as UserEntity
+
+        if (!user) return this.httpResponse.Unauthorized(res, `You do not have permission to access`)
 
         return (user.role.id === RolesID.DEAN)
             ? next()
@@ -149,20 +156,35 @@ export class AuthMiddleware {
         })
     }
 
+    /**
+     * It takes a JWT from the request header, verifies it, and then adds the payload to the request object
+     * @param {Request} req - Request - The request object
+     * @param {Response} res - Response - the response object
+     * @param {NextFunction} next - NextFunction
+     * @returns The function validateJWT is being returned.
+     */
     public validateJWT = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            if (!req.headers.authorization) return this.httpResponse.Unauthorized(res, `Token not found`)
+            let jwt = req.headers.authorization
+            if (!jwt) return this.httpResponse.Unauthorized(res, `Token not found`)
 
-            const token = req.headers.authorization.split(' ').pop()
-            if (!token) return this.httpResponse.Unauthorized(res, `Token Not Found`)
+            try {
+                if (jwt.toLocaleLowerCase().startsWith('bearer')) {
+                    jwt = jwt.slice('bearer'.length).trim()
+                }
+                if (!jwt) return this.httpResponse.Unauthorized(res, `Token Not Found`)
 
-            const payload: PayloadToken = _authService.verifyJWT(token)
+                const payload = await _authService.verifyJWT(jwt) as TokenPayload
 
-            if (payload.id) return this.httpResponse.Unauthorized(res, `ID not found in token`)
+                req.user = payload
+                next()
+                // eslint-disable-next-line
+            } catch (error: any) {
+                if (error.name === 'TokenExpiredError') return this.httpResponse.Unauthorized(res, `Expired JWT`)
 
-            req.user = payload
-
-            next()
+                console.log(red(`Error un AuthMiddleware: validateJWT: `), error)
+                return this.httpResponse.InternalServerError(res, error)
+            }
         } catch (error) {
             console.log(red(`Error un AuthMiddleware: validateJWT: `), error)
             return this.httpResponse.InternalServerError(res, error)

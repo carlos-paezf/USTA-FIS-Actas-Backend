@@ -11,7 +11,7 @@ import { RoleModulePermissionEntity } from "./role-module-permission.entity";
  */
 @Entity({ name: `permissions` })
 export class PermissionEntity extends BaseEntity {
-    @Column()
+    @Column({ unique: true, nullable: false })
     permissionName!: string
 
     @Column()
