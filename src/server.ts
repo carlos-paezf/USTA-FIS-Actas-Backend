@@ -1,7 +1,8 @@
 import 'reflect-metadata'
+import cors from 'cors'
 import express from 'express'
 import morgan from 'morgan'
-import cors from 'cors'
+// import morganBody from 'morgan-body'
 
 import { DataSource } from 'typeorm'
 import { blue, green, red } from 'colors'
@@ -9,7 +10,7 @@ import { blue, green, red } from 'colors'
 import { ConfigServer } from './config'
 import { ModuleRouter, PermissionRouter, RoleModulePermissionRouter, RoleRouter, UserRouter } from './routes'
 import { AuthRouter } from './auth/router/auth.router'
-// import { loggerStream } from './helpers/logger.helper'
+// import { accessLoggerStream, loggerStream } from './helpers/logger.helper'
 
 
 /**
@@ -24,14 +25,18 @@ class ServerBootstrap extends ConfigServer {
 
         this._app.use(express.json())
         this._app.use(express.urlencoded({ extended: true }))
+        this._app.use(morgan('common'))
         /* this._app.use(morgan(
             ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :req[header] :res[content-type]',
             {
-                skip: function (req, res) { return res.statusCode < 400 },
-                stream: loggerStream
+                stream: accessLoggerStream
             }
-            )) */
-        this._app.use(morgan('common'))
+        )) */
+        /* morganBody(this._app, {
+            noColors: true,
+            skip: function (req, res) { return res.statusCode < 500 },
+            stream: loggerStream
+        }) */
         this._app.use(cors())
 
         this._dbConnect()

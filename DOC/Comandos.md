@@ -38,7 +38,7 @@
 - Instalar dependencias de producción a usar en el proyecto:
   
   ```txt
-  pnpm install @slack/webhook bcrypt class-transformer class-validator colors cors dotenv express express-validator jsonwebtoken morgan multer mysql passport passport-jwt passport-local reflect-metadata typeorm typeorm-naming-strategies typescript -S
+  pnpm install @slack/webhook bcrypt class-transformer class-validator colors cors dotenv express express-validator jsonwebtoken morgan morgan-body multer mysql passport passport-jwt passport-local reflect-metadata typeorm typeorm-naming-strategies typescript -S
   ```
 
 - Instalar dependencias de desarrollo:

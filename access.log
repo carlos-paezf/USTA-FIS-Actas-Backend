@@ -1,0 +1,2 @@
+::1 - - [24/Jun/2022:01:57:30 +0000] "POST /auth//login HTTP/1.1" 400 85 - application/json; charset=utf-8
+::1 - - [24/Jun/2022:01:57:37 +0000] "POST /auth//login HTTP/1.1" 200 950 - application/json; charset=utf-8
