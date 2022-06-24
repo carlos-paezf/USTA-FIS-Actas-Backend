@@ -17,16 +17,16 @@ export class HistoricalController extends BaseController<HistoricalService> {
                 Number(from), Number(limit), String(order).toUpperCase()
             )
 
-            if (!data.length) return await this._httpResponse.NotFound(req, res, `There are no results for the search`)
+            if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the search`)
 
-            return await this._httpResponse.Ok(req, res, {
+            return this._httpResponse.Ok(res, {
                 from, limit, order,
                 partialCount: data.length, totalCount,
                 data
             })
         } catch (error) {
             console.log(red(`Error in RecordController:findAllMoves: `), error)
-            return await this._httpResponse.InternalServerError(req, res, error)
+            return this._httpResponse.InternalServerError(res, error)
         }
     }
 
@@ -36,12 +36,12 @@ export class HistoricalController extends BaseController<HistoricalService> {
 
             const data = await this._service.findMoveById(id)
 
-            if (!data) return await this._httpResponse.NotFound(req, res, `There are no results for the id '${id}'`)
+            if (!data) return this._httpResponse.NotFound(res, `There are no results for the id '${id}'`)
 
-            return await this._httpResponse.Ok(req, res, data)
+            return this._httpResponse.Ok(res, data)
         } catch (error) {
             console.log(red(`Error in RecordController:findMoveById: `), error)
-            return await this._httpResponse.InternalServerError(req, res, error)
+            return this._httpResponse.InternalServerError(res, error)
         }
     }
 
@@ -51,12 +51,12 @@ export class HistoricalController extends BaseController<HistoricalService> {
 
             const [data, totalCount] = await this._service.findMovesByUser(userId)
 
-            if (!data.length) return await this._httpResponse.NotFound(req, res, `There are no results for the id '${userId}'`)
+            if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the id '${userId}'`)
 
-            return await this._httpResponse.Ok(req, res, { totalCount, data })
+            return this._httpResponse.Ok(res, { totalCount, data })
         } catch (error) {
             console.log(red(`Error in RecordController:findMoveByUser: `), error)
-            return await this._httpResponse.InternalServerError(req, res, error)
+            return this._httpResponse.InternalServerError(res, error)
         }
     }
 
@@ -68,16 +68,16 @@ export class HistoricalController extends BaseController<HistoricalService> {
                 Number(from), Number(limit)
             )
 
-            if (!data.length) return await this._httpResponse.NotFound(req, res, `There are no results for the search`)
+            if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the search`)
 
-            return await this._httpResponse.Ok(req, res, {
+            return this._httpResponse.Ok(res, {
                 from, limit,
                 partialCount: data.length, totalCount,
                 data
             })
         } catch (error) {
             console.log(red(`Error in RecordController:findMoveByUser: `), error)
-            return await this._httpResponse.InternalServerError(req, res, error)
+            return this._httpResponse.InternalServerError(res, error)
         }
     }
 }

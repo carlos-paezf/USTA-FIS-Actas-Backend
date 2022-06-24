@@ -17,14 +17,14 @@ export class HistoricalEntity extends BaseEntity {
     responseStatusCode!: number
 
     @Column({ name: `user_id` })
-    user!: UserEntity
+    user!: string
 
     @Column({ name: `role_id` })
-    role!: RoleEntity
+    role!: string
 
     @Column({ name: `module_id` })
-    module!: ModuleEntity
+    module!: string
 
     @Column({ name: `permission_id` })
-    permission!: PermissionEntity
+    permission!: string
 }

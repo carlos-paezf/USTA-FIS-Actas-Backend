@@ -1,8 +1,7 @@
 import { BaseRouter } from '../config';
-import { HistoricalController } from '../controllers';
+import { HistoricalController } from '../controllers/historical.controller';
 import { ModulesID, PermissionsID } from '../helpers/enums.helper';
-import { HistoricalMiddleware } from '../middlewares';
-
+import { HistoricalMiddleware } from '../middlewares/historical.middleware';
 
 
 export class HistoricalRouter extends BaseRouter<HistoricalController, HistoricalMiddleware> {

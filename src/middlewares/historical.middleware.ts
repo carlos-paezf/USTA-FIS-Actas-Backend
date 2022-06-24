@@ -16,11 +16,11 @@ export class HistoricalMiddleware extends SharedMiddleware<HistoricalService> {
             const moveExists = await this._service.findMoveById(id)
 
             return (!moveExists)
-                ? await this.httpResponse.NotFound(req, res, `There are no results for the id '${id}'`)
+                ? this.httpResponse.NotFound(res, `There are no results for the id '${id}'`)
                 : next()
         } catch (error) {
             console.log(red(`Error in HistoricalMiddleware:idParamValidator: `), error)
-            return await this.httpResponse.InternalServerError(req, res, error)
+            return this.httpResponse.InternalServerError(res, error)
         }
     }
 }

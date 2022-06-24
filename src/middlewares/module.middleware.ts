@@ -19,11 +19,11 @@ export class ModuleMiddleware extends SharedMiddleware<ModuleService> {
             const moduleExists = await this._service.findOneModuleById(id)
 
             return (!moduleExists)
-                ? await this.httpResponse.NotFound(req, res, `There are no results for the id '${id}'`)
+                ? this.httpResponse.NotFound(res, `There are no results for the id '${id}'`)
                 : next()
         } catch (error) {
             console.log(red(`Error in ModuleMiddleware:idParamValidator: `), error)
-            return await this.httpResponse.InternalServerError(req, res, error)
+            return this.httpResponse.InternalServerError(res, error)
         }
     }
 
@@ -32,11 +32,11 @@ export class ModuleMiddleware extends SharedMiddleware<ModuleService> {
             const moduleEnable = await this._service.moduleIsEnabled(idDisabled)
 
             return (!moduleEnable)
-                ? await this.httpResponse.PreconditionFailed(req, res, `The module with the id ${idDisabled} is already disabled`)
+                ? this.httpResponse.PreconditionFailed(res, `The module with the id ${idDisabled} is already disabled`)
                 : next()
         } catch (error) {
             console.log(red(`Error in ModuleMiddleware:idDisabledValidator: `), error)
-            return await this.httpResponse.InternalServerError(req, res, error)
+            return this.httpResponse.InternalServerError(res, error)
         }
     }
 
@@ -45,11 +45,11 @@ export class ModuleMiddleware extends SharedMiddleware<ModuleService> {
             const moduleEnable = await this._service.moduleIsEnabled(idEnabled)
 
             return moduleEnable
-                ? await this.httpResponse.PreconditionFailed(req, res, `The module with the id ${idEnabled} is already enabled`)
+                ? this.httpResponse.PreconditionFailed(res, `The module with the id ${idEnabled} is already enabled`)
                 : next()
         } catch (error) {
             console.log(red(`Error in ModuleMiddleware:idRestoreValidator: `), error)
-            return await this.httpResponse.InternalServerError(req, res, error)
+            return this.httpResponse.InternalServerError(res, error)
         }
     }
 
@@ -58,7 +58,7 @@ export class ModuleMiddleware extends SharedMiddleware<ModuleService> {
         const roleExists = await this._service.findOneModuleByName(moduleName.toUpperCase())
 
         return (roleExists)
-            ? await this.httpResponse.BadRequest(req, res, `The module name '${moduleName}' is already being used`)
+            ? this.httpResponse.BadRequest(res, `The module name '${moduleName}' is already being used`)
             : next()
     }
 
@@ -71,7 +71,7 @@ export class ModuleMiddleware extends SharedMiddleware<ModuleService> {
         valid.moduleDescription = moduleDescription
 
         validate(valid).then(async (error) => {
-            return error.length ? await this.httpResponse.PreconditionFailed(req, res, error) : next()
+            return error.length ? this.httpResponse.PreconditionFailed(res, error) : next()
         })
     }
 }
