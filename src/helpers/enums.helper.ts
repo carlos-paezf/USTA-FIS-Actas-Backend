@@ -14,7 +14,8 @@ export enum ModulesID {
     PERMISSIONS = `permissions`,
     MINUTES_OF_MEETING = `minutes-of-meeting`,
     ROLES_MODULES_PERMISSIONS = `roles-modules-permissions`,
-    MODULES = `modules`
+    MODULES = `modules`,
+    HISTORICAL = `historical`
 }
 
 

@@ -142,6 +142,12 @@ VALUES (
         'MODULES',
         'Module'
     );
+INSERT INTO `modules` (`id`, `module_name`, `module_description`)
+VALUES (
+        'historical',
+        'HISTORICAL',
+        'Historical Module'
+    );
 /* --------------------------------------------------------------- */
 /* Inserción para Roles */
 /* --------------------------------------------------------------- */
@@ -318,6 +324,8 @@ VALUES (
         'modules',
         'hard-delete'
     );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'historical', 'read');
 -- Permisos para decano(a)
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'dean', 'users', 'create');
@@ -461,6 +469,8 @@ VALUES (
         'modules',
         'hard-delete'
     );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'historical', 'read');
 -- Permisos para docente
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'professor', 'users', 'create');

@@ -69,6 +69,26 @@ CREATE TABLE `users` (
 ) ENGINE = InnoDB;
 ALTER TABLE `users`
 ADD CONSTRAINT `FK_a2cecd1a3531c0b041e29ba46e1` FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+CREATE TABLE `historical` (
+    `id` varchar(36) NOT NULL,
+    `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    `deleted_at` timestamp(6) NULL,
+    `response_status_code` int NOT NULL,
+    `user_id` varchar(36) NULL,
+    `role_id` varchar(36) NULL,
+    `module_id` varchar(36) NULL,
+    `permission_id` varchar(36) NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+ALTER TABLE `historical`
+ADD CONSTRAINT `FK_e28cccb0d33870ac1f81f7a727d` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `historical`
+ADD CONSTRAINT `FK_a28dddc9e11324ac1f81f712adb` FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `historical`
+ADD CONSTRAINT `FK_6fe29c1ac45f3febc6c5701c33d` FOREIGN KEY (`module_id`) REFERENCES `modules`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `historical`
+ADD CONSTRAINT `FK_df791dc106beff6270273c371a5` FOREIGN KEY (`permission_id`) REFERENCES `permissions`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 /* ---------------------------------------------------------------------------------------------------------------------------- */
 /* ------------------------------------------------ Inserción de datos básicos ------------------------------------------------ */
 /* ---------------------------------------------------------------------------------------------------------------------------- */
@@ -212,6 +232,12 @@ VALUES (
         'modules',
         'MODULES',
         'Module'
+    );
+INSERT INTO `modules` (`id`, `module_name`, `module_description`)
+VALUES (
+        'historical',
+        'HISTORICAL',
+        'Historical Module'
     );
 /* --------------------------------------------------------------- */
 /* Inserción para Roles */
@@ -389,6 +415,8 @@ VALUES (
         'modules',
         'hard-delete'
     );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'historical', 'read');
 -- Permisos para decano(a)
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'dean', 'users', 'create');
@@ -532,6 +560,8 @@ VALUES (
         'modules',
         'hard-delete'
     );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'historical', 'read');
 -- Permisos para docente
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'professor', 'users', 'create');
