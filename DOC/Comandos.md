@@ -38,13 +38,13 @@
 - Instalar dependencias de producción a usar en el proyecto:
   
   ```txt
-  pnpm install @slack/webhook bcrypt class-transformer class-validator colors cors dotenv express express-validator jsonwebtoken morgan morgan-body multer mysql passport passport-jwt passport-local reflect-metadata typeorm typeorm-naming-strategies typescript -S
+  pnpm install @slack/webhook bcrypt class-transformer class-validator colors cors dotenv express express-fileupload express-validator jsonwebtoken morgan morgan-body multer mysql passport passport-jwt passport-local reflect-metadata typeorm typeorm-naming-strategies typescript -S
   ```
 
 - Instalar dependencias de desarrollo:
 
   ```txt
-  pnpm install -D @types/bcrypt @types/cors @types/express @types/express-validator @types/jsonwebtoken @types/morgan @types/multer @types/node@"*" @types/passport @types/passport-jwt @types/passport-local concurrently eslint nodemon ts-node
+  pnpm install -D @types/bcrypt @types/cors @types/express @types/express-fileupload @types/express-validator @types/jsonwebtoken @types/morgan @types/multer @types/node@"*" @types/passport @types/passport-jwt @types/passport-local concurrently eslint nodemon ts-node
   ```
 
 - Configurar scripts del proyecto en `package.json`:

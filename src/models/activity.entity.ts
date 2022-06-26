@@ -14,7 +14,7 @@ export enum FulfillmentType {
 
 @Entity({ name: `activity` })
 export class ActivityEntity extends BaseEntity {
-    @Column()
+    @Column({ type: 'text' })
     nameActivity!: string
 
     @ManyToOne(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.commitments)
@@ -25,7 +25,7 @@ export class ActivityEntity extends BaseEntity {
     @JoinColumn({ name: `responsible_user_id` })
     responsibleUser!: UserEntity
 
-    @Column({ type: 'timestamp' })
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     activityDate!: Date
 
     @Column({ type: 'enum', enum: FulfillmentType, nullable: false, default: FulfillmentType.NO })

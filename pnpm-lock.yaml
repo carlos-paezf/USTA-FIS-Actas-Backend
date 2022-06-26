@@ -5,6 +5,7 @@ specifiers:
   '@types/bcrypt': ^5.0.0
   '@types/cors': ^2.8.12
   '@types/express': ^4.17.13
+  '@types/express-fileupload': ^1.2.2
   '@types/jsonwebtoken': ^8.5.8
   '@types/morgan': ^1.9.3
   '@types/multer': ^1.4.7
@@ -23,6 +24,7 @@ specifiers:
   dotenv: ^16.0.1
   eslint: ^8.18.0
   express: ^4.18.1
+  express-fileupload: ^1.4.0
   express-validator: ^6.14.1
   jsonwebtoken: ^8.5.1
   morgan: ^1.10.0
@@ -48,6 +50,7 @@ dependencies:
   cors: 2.8.5
   dotenv: 16.0.1
   express: 4.18.1
+  express-fileupload: 1.4.0
   express-validator: 6.14.1
   jsonwebtoken: 8.5.1
   morgan: 1.10.0
@@ -66,6 +69,7 @@ devDependencies:
   '@types/bcrypt': 5.0.0
   '@types/cors': 2.8.12
   '@types/express': 4.17.13
+  '@types/express-fileupload': 1.2.2
   '@types/jsonwebtoken': 8.5.8
   '@types/morgan': 1.9.3
   '@types/multer': 1.4.7
@@ -229,6 +233,12 @@ packages:
       '@types/node': 18.0.0
     dev: true
 
+  /@types/busboy/0.3.2:
+    resolution: {integrity: sha512-iEvdm9Z9KdSs/ozuh1Z7ZsXrOl8F4M/CLMXPZHr3QuJ4d6Bjn+HBMC5EMKpwpAo8oi8iK9GZfFoHaIMrrZgwVw==}
+    dependencies:
+      '@types/node': 18.0.0
+    dev: true
+
   /@types/connect/3.4.35:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
@@ -237,6 +247,13 @@ packages:
 
   /@types/cors/2.8.12:
     resolution: {integrity: sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==}
+    dev: true
+
+  /@types/express-fileupload/1.2.2:
+    resolution: {integrity: sha512-sWU1EVFfLsdAginKVrkwTRbRPnbn7dawxEFEBgaRDcpNFCUuksZtASaAKEhqwEIg6fSdeTyI6dIUGl3thhrypg==}
+    dependencies:
+      '@types/busboy': 0.3.2
+      '@types/express': 4.17.13
     dev: true
 
   /@types/express-serve-static-core/4.17.29:
@@ -1185,6 +1202,13 @@ packages:
   /etag/1.8.1:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
+    dev: false
+
+  /express-fileupload/1.4.0:
+    resolution: {integrity: sha512-RjzLCHxkv3umDeZKeFeMg8w7qe0V09w3B7oGZprr/oO2H/ISCgNzuqzn7gV3HRWb37GjRk429CCpSLS2KNTqMQ==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      busboy: 1.6.0
     dev: false
 
   /express-validator/6.14.1:

@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from "ty
 import { BaseEntity } from "../config";
 import { ActivityEntity } from "./activity.entity";
 import { AttachedFilesEntity } from "./attached-files.entity";
-import { SubjectAgendaItem } from "./subject-agenda-item.entity";
+import { SubjectAgendaItemEntity } from "./subject-agenda-item.entity";
 import { UserEntity } from "./user.entity";
 
 
@@ -20,7 +20,7 @@ export class MeetingMinutesEntity extends BaseEntity {
     @Column()
     meetingPlace!: string
 
-    @Column({ type: 'timestamp' })
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     meetingDate!: Date
 
     @Column()
@@ -41,8 +41,8 @@ export class MeetingMinutesEntity extends BaseEntity {
     @JoinColumn()
     guest!: UserEntity[]
 
-    @OneToMany(() => SubjectAgendaItem, (item) => item.meetingMinutes, { cascade: true })
-    agendaSubjectItems!: SubjectAgendaItem[]
+    @OneToMany(() => SubjectAgendaItemEntity, (item) => item.meetingMinutes, { cascade: true })
+    agendaSubjectItems!: SubjectAgendaItemEntity[]
 
     @OneToMany(() => ActivityEntity, (activity) => activity.meetingMinutes, { cascade: true })
     commitments!: ActivityEntity[]

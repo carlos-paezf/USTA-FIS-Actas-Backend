@@ -1,6 +1,11 @@
-export { UserService } from "./user.service";
-export { RoleService } from './role.service';
+export { ActivityService } from './activity.service';
+export { AttachedFilesService } from './attached-files.service';
+export { HistoricalService } from './historical.service';
+export { MeetingMinutesService } from './meeting-minutes.service';
 export { ModuleService } from './module.service';
+export { ObservationService } from "./observation.service";
 export { PermissionService } from './permission.service';
 export { RoleModulePermissionService } from './role-module-permission.service';
-export { HistoricalService } from './historical.service';
+export { RoleService } from './role.service';
+export { SubjectAgendaItemService } from "./subject-agenda-item.service";
+export { UserService } from "./user.service";

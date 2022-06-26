@@ -8,5 +8,5 @@ export { ObservationEntity } from './observation.entity';
 export { PermissionEntity } from "./permission.entity";
 export { RoleEntity } from "./role.entity";
 export { RoleModulePermissionEntity } from './role-module-permission.entity';
-export { SubjectAgendaItem } from './subject-agenda-item.entity';
+export { SubjectAgendaItemEntity } from './subject-agenda-item.entity';
 export { UserEntity } from "./user.entity";

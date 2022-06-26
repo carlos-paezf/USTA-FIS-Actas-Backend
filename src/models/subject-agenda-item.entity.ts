@@ -4,7 +4,7 @@ import { MeetingMinutesEntity } from "./meeting-minutes.entity";
 
 
 @Entity({ name: `subject_agenda_item` })
-export class SubjectAgendaItem extends BaseEntity {
+export class SubjectAgendaItemEntity extends BaseEntity {
     @ManyToOne(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.agendaSubjectItems)
     @JoinColumn({ name: 'meeting_minutes_id' })
     meetingMinutes!: MeetingMinutesEntity
