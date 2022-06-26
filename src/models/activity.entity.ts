@@ -28,7 +28,7 @@ export class ActivityEntity extends BaseEntity {
     @Column({ type: 'timestamp' })
     activityDate!: Date
 
-    @Column({ type: 'enum', enum: FulfillmentType, nullable: false })
+    @Column({ type: 'enum', enum: FulfillmentType, nullable: false, default: FulfillmentType.NO })
     fulfillment!: FulfillmentType
 
     @OneToMany(() => ObservationEntity, (observation) => observation.activity, { cascade: true })

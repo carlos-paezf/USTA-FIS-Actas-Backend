@@ -1,6 +1,11 @@
-export { UserDTO } from './user.dto';
+export { ActivityDTO } from './activity.dto';
+export { AttachedFilesDTO } from './attached-files.dto';
+export { MeetingMinutesDTO } from './meeting-minutes.dto';
+export { ModuleDTO } from './module.dto';
+export { ObservationDTO } from './observation.dto';
+export { PermissionDTO } from './permission.dto';
 export { PositionType } from "./user.dto";
 export { RoleDTO } from './role.dto';
-export { ModuleDTO } from './module.dto';
-export { PermissionDTO } from './permission.dto';
 export { RoleModulePermissionDTO } from './role-module-permission.dto';
+export { SubjectAgendaItemDTO } from './subject-agenda-item.dto';
+export { UserDTO } from './user.dto';
