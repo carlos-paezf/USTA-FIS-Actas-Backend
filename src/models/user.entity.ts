@@ -1,6 +1,7 @@
 import { Exclude } from "class-transformer";
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../config";
+import { ActivityEntity } from "./activity.entity";
 import { RoleEntity } from "./role.entity";
 
 
@@ -35,4 +36,13 @@ export class UserEntity extends BaseEntity {
     @ManyToOne(() => RoleEntity, (role) => role.users)
     @JoinColumn({ name: 'role_id' })
     role!: RoleEntity
+
+    @OneToMany(() => ActivityEntity, (activity) => activity.responsibleUser)
+    activity!: ActivityEntity
+
+    @OneToMany(() => ActivityEntity, (activity) => activity.responsibleUser)
+    meetingMinutesCreated!: ActivityEntity
+
+    @OneToMany(() => ActivityEntity, (activity) => activity.responsibleUser)
+    meetingMinutesReviewed!: ActivityEntity
 }

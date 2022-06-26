@@ -112,3 +112,9 @@
   ```txt
   npx qnm doctor --sort duplicates
   ```
+
+- Detectar dependencias circulares
+
+  ```txt
+  npx madge --circular --extensions ts .
+  ```
