@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../config";
 import { ActivityEntity } from "./activity.entity";
 import { AttachedFilesEntity } from "./attached-files.entity";
@@ -29,20 +29,8 @@ export class MeetingMinutesEntity extends BaseEntity {
     @Column()
     endingTime!: string
 
-    @ManyToMany(() => UserEntity)
-    @JoinColumn()
-    summoned!: UserEntity[]
-
-    @ManyToMany(() => UserEntity)
-    @JoinColumn()
-    absent!: UserEntity[]
-
-    @ManyToMany(() => UserEntity)
-    @JoinColumn()
-    guest!: UserEntity[]
-
     @OneToMany(() => SubjectAgendaItemEntity, (item) => item.meetingMinutes, { cascade: true })
-    agendaSubjectItems!: SubjectAgendaItemEntity[]
+    subjectAgendaItems!: SubjectAgendaItemEntity[]
 
     @OneToMany(() => ActivityEntity, (activity) => activity.meetingMinutes, { cascade: true })
     commitments!: ActivityEntity[]
@@ -57,4 +45,40 @@ export class MeetingMinutesEntity extends BaseEntity {
     @ManyToOne(() => UserEntity, (user) => user.meetingMinutesReviewed)
     @JoinColumn({ name: `reviewed_by_id` })
     reviewedBy!: UserEntity
+
+    @ManyToMany(() => UserEntity, (user) => user.summoned)
+    @JoinTable({
+        name: 'meeting_minutes_summoned',
+        joinColumn: {
+            name: `meeting_minutes_id`
+        },
+        inverseJoinColumn: {
+            name: `user_id`
+        }
+    })
+    summoned!: UserEntity[]
+
+    @ManyToMany(() => UserEntity, (user) => user.absent)
+    @JoinTable({
+        name: 'meeting_minutes_absent',
+        joinColumn: {
+            name: `meeting_minutes_id`
+        },
+        inverseJoinColumn: {
+            name: `user_id`
+        }
+    })
+    absent!: UserEntity[]
+
+    @ManyToMany(() => UserEntity, (user) => user.guest)
+    @JoinTable({
+        name: 'meeting_minutes_guest',
+        joinColumn: {
+            name: `meeting_minutes_id`
+        },
+        inverseJoinColumn: {
+            name: `user_id`
+        }
+    })
+    guest!: UserEntity[]
 }

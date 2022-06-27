@@ -1,7 +1,8 @@
 import { Exclude } from "class-transformer";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../config";
 import { ActivityEntity } from "./activity.entity";
+import { MeetingMinutesEntity } from "./meeting-minutes.entity";
 import { RoleEntity } from "./role.entity";
 
 
@@ -40,9 +41,18 @@ export class UserEntity extends BaseEntity {
     @OneToMany(() => ActivityEntity, (activity) => activity.responsibleUser)
     activity!: ActivityEntity
 
-    @OneToMany(() => ActivityEntity, (activity) => activity.responsibleUser)
-    meetingMinutesCreated!: ActivityEntity
+    @OneToMany(() => MeetingMinutesEntity, (activity) => activity.createdBy)
+    meetingMinutesCreated!: MeetingMinutesEntity
 
-    @OneToMany(() => ActivityEntity, (activity) => activity.responsibleUser)
-    meetingMinutesReviewed!: ActivityEntity
+    @OneToMany(() => MeetingMinutesEntity, (activity) => activity.reviewedBy)
+    meetingMinutesReviewed!: MeetingMinutesEntity
+
+    @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.summoned)
+    summoned!: UserEntity[]
+
+    @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.absent)
+    absent!: UserEntity[]
+
+    @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.guest)
+    guest!: UserEntity[]
 }

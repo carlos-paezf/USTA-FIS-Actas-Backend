@@ -8,9 +8,11 @@ import { DataSource } from 'typeorm'
 import { blue, green, red } from 'colors'
 
 import { ConfigServer } from './config'
-import { ModuleRouter, PermissionRouter, RoleModulePermissionRouter, RoleRouter, UserRouter } from './routes'
-import { AuthRouter } from './auth/router/auth.router'
 // import { accessLoggerStream, loggerStream } from './helpers/logger.helper'
+import { AuthRouter } from './auth/router/auth.router'
+import {
+    MeetingMinutesRouter, ModuleRouter, PermissionRouter, RoleModulePermissionRouter, RoleRouter, UserRouter
+} from './routes'
 
 
 /**
@@ -58,7 +60,8 @@ class ServerBootstrap extends ConfigServer {
             new RoleRouter().router,
             new ModuleRouter().router,
             new PermissionRouter().router,
-            new RoleModulePermissionRouter().router
+            new RoleModulePermissionRouter().router,
+            new MeetingMinutesRouter().router
         ]
     }
 

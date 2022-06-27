@@ -1,4 +1,4 @@
-import { UpdateResult, DeleteResult } from "typeorm";
+import { UpdateResult, DeleteResult, In } from "typeorm";
 import { BaseService } from "../config";
 import { UserDTO } from "../dtos";
 import { PasswordEncrypter } from "../helpers/password-encrypter.helper";
@@ -92,6 +92,15 @@ export class UserService extends BaseService<UserEntity> {
             where: { username },
             select: { id: true, password: true }
         })
+    }
+
+    /**
+     * Find all users by their ids
+     * @param {string[]} arrayIds - string[]
+     * @returns An array of UserEntity objects.
+     */
+    public async findUsersByIds(arrayIds: string[]): Promise<UserEntity[]> {
+        return (await this.execRepository).findBy({ id: In(arrayIds) })
     }
 
     /**

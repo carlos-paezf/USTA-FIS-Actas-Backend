@@ -21,19 +21,24 @@ export class MeetingMinutesService extends BaseService<MeetingMinutesEntity> {
         return (await this.execRepository).findOne({
             where: { id },
             relations: {
-                absent: true,
-                agendaSubjectItems: true,
-                attachedFiles: true,
-                commitments: true,
-                reviewedBy: true,
-                guest: true,
                 summoned: true,
+                absent: true,
+                guest: true,
+                subjectAgendaItems: true,
+                commitments: true,
+                attachedFiles: true,
+                createdBy: true,
+                reviewedBy: true,
             },
             withDeleted: true
         })
     }
 
-    public async createOneMeetingMinutes(body: MeetingMinutesDTO): Promise<MeetingMinutesEntity> {
+    public async createMeetingMinutes(body: MeetingMinutesDTO): Promise<MeetingMinutesEntity> {
+        return (await this.execRepository).create(body)
+    }
+
+    public async saveMeetingMinutes(body: MeetingMinutesDTO): Promise<MeetingMinutesEntity> {
         return (await this.execRepository).save(body)
     }
 

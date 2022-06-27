@@ -1,6 +1,6 @@
 import { IsDate, IsNotEmpty, IsOptional } from "class-validator";
 import { BaseDTO } from "../config";
-import { UserEntity } from "../models";
+import { SubjectAgendaItemEntity, UserEntity } from "../models";
 
 
 export class MeetingMinutesDTO extends BaseDTO {
@@ -34,6 +34,9 @@ export class MeetingMinutesDTO extends BaseDTO {
 
     @IsOptional()
     guest?: UserEntity[]
+
+    @IsNotEmpty()
+    subjectAgendaItems!: SubjectAgendaItemEntity[]
 
     @IsNotEmpty()
     createdBy!: UserEntity
