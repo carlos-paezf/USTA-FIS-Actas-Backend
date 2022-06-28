@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../config";
 import { MeetingMinutesEntity } from "./meeting-minutes.entity";
 import { ObservationEntity } from "./observation.entity";
@@ -17,14 +17,6 @@ export class ActivityEntity extends BaseEntity {
     @Column({ type: 'text' })
     nameActivity!: string
 
-    @ManyToOne(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.commitments)
-    @JoinColumn({ name: `meeting_minutes_id` })
-    meetingMinutes!: MeetingMinutesEntity
-
-    @ManyToOne(() => UserEntity, (user) => user.activity)
-    @JoinColumn({ name: `responsible_user_id` })
-    responsibleUser!: UserEntity
-
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     activityDate!: Date
 
@@ -33,4 +25,20 @@ export class ActivityEntity extends BaseEntity {
 
     @OneToMany(() => ObservationEntity, (observation) => observation.activity, { cascade: true })
     observations!: ObservationEntity[]
+
+    @ManyToMany(() => UserEntity, (user) => user.activities)
+    @JoinTable({
+        name: `activity_user`,
+        joinColumn: {
+            name: `activity_id`
+        },
+        inverseJoinColumn: {
+            name: `user_id`
+        }
+    })
+    responsibleUsers!: UserEntity[]
+
+    @ManyToOne(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.commitments)
+    @JoinColumn({ name: `meeting_minutes_id` })
+    meetingMinutes!: MeetingMinutesEntity
 }

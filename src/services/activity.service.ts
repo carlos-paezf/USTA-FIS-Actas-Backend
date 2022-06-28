@@ -9,11 +9,13 @@ export class ActivityService extends BaseService<ActivityEntity> {
         super(ActivityEntity)
     }
 
-    public async findAllActivitiesByMeetingMinutes(meetingMinutesId: string): Promise<[ActivityEntity[], number]> {
+    public async findAllActivitiesByMeetingMinutesId(meetingMinutesId: string): Promise<[ActivityEntity[], number]> {
         return (await this.execRepository)
             .createQueryBuilder('activity')
             .where(`activity.meetingMinutes = :meetingMinutesId`, { meetingMinutesId })
             .leftJoin(`activity.meetingMinutes`, `meetingMinutes`, `meetingMinutes.id = :meetingMinutesId`, { meetingMinutesId })
+            .leftJoin(`activity.responsibleUser`, `user`)
+            .leftJoin(`activity.observations`, `observations`)
             .getManyAndCount()
     }
 

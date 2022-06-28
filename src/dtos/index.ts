@@ -3,6 +3,7 @@ export { AttachedFilesDTO } from './attached-files.dto';
 export { MeetingMinutesDTO } from './meeting-minutes.dto';
 export { ModuleDTO } from './module.dto';
 export { ObservationDTO } from './observation.dto';
+export { OrganizationDTO } from './organization.dto';
 export { PermissionDTO } from './permission.dto';
 export { PositionType } from "./user.dto";
 export { RoleDTO } from './role.dto';

@@ -1,21 +1,15 @@
 import { Request, Response } from "express";
 import { BaseController } from "../config";
-import { ActivityService, AttachedFilesService, MeetingMinutesService, SubjectAgendaItemService, UserService } from "../services";
+import { MeetingMinutesService, UserService } from "../services";
 import { red } from 'colors';
 
 
 export class MeetingMinutesController extends BaseController<MeetingMinutesService> {
     private _userService: UserService
-    private _subjectAgendaItemService: SubjectAgendaItemService
-    private _activityService: ActivityService
-    private _attachedFilesService: AttachedFilesService
 
     constructor() {
         super(MeetingMinutesService)
         this._userService = new UserService()
-        this._subjectAgendaItemService = new SubjectAgendaItemService()
-        this._activityService = new ActivityService()
-        this._attachedFilesService = new AttachedFilesService()
     }
 
     public findAllMeetingMinutes = async (req: Request, res: Response) => {
@@ -56,7 +50,7 @@ export class MeetingMinutesController extends BaseController<MeetingMinutesServi
 
     public createMeetingMinutes = async (req: Request, res: Response) => {
         try {
-            const { summoned, absent, guest, subjectAgendaItems } = req.body
+            const { summoned, absent, guest } = req.body
 
             let summonedUsers
             if (summoned.length) {
@@ -77,10 +71,8 @@ export class MeetingMinutesController extends BaseController<MeetingMinutesServi
             }
 
             const meetingMinutes = await this._service.saveMeetingMinutes({
-                ...req.body, summoned: summonedUsers, absent: absentUsers, guest: guestUsers
+                ...req.body, summoned: summonedUsers, absent: absentUsers, guest: guestUsers,
             })
-
-            // TODO: Intentar solucionar con relación N:N las relaciones faltantes 
 
             return this._httpResponse.Created(res, meetingMinutes)
         } catch (error) {

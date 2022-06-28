@@ -1,6 +1,6 @@
 import { IsDate, IsNotEmpty, IsOptional } from "class-validator";
 import { BaseDTO } from "../config";
-import { SubjectAgendaItemEntity, UserEntity } from "../models";
+import { ActivityEntity, OrganizationEntity, SubjectAgendaItemEntity, UserEntity } from "../models";
 
 
 export class MeetingMinutesDTO extends BaseDTO {
@@ -11,7 +11,7 @@ export class MeetingMinutesDTO extends BaseDTO {
     isRegular?: boolean
 
     @IsNotEmpty()
-    organismCommitteeAreaProgram!: string
+    organizationCommitteeAreaProgram!: OrganizationEntity
 
     @IsNotEmpty()
     meetingPlace!: string
@@ -37,6 +37,9 @@ export class MeetingMinutesDTO extends BaseDTO {
 
     @IsNotEmpty()
     subjectAgendaItems!: SubjectAgendaItemEntity[]
+
+    @IsNotEmpty()
+    commitments!: ActivityEntity[]
 
     @IsNotEmpty()
     createdBy!: UserEntity

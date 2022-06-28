@@ -1,17 +1,11 @@
 import { IsDate, IsEnum, IsNotEmpty, IsOptional } from "class-validator";
 import { BaseDTO } from "../config";
-import { FulfillmentType, MeetingMinutesEntity, UserEntity } from "../models";
+import { FulfillmentType, MeetingMinutesEntity, ObservationEntity, UserEntity } from "../models";
 
 
 export class ActivityDTO extends BaseDTO {
     @IsNotEmpty()
     nameActivity!: string
-
-    @IsNotEmpty()
-    meetingMinutes!: MeetingMinutesEntity
-
-    @IsNotEmpty()
-    responsibleUser!: UserEntity
 
     @IsNotEmpty()
     @IsDate()
@@ -20,4 +14,13 @@ export class ActivityDTO extends BaseDTO {
     @IsOptional()
     @IsEnum(FulfillmentType)
     fulfillment?: FulfillmentType
+
+    @IsOptional()
+    observations?: ObservationEntity[]
+
+    @IsNotEmpty()
+    responsibleUsers!: UserEntity[]
+
+    @IsNotEmpty()
+    meetingMinutes!: MeetingMinutesEntity
 }

@@ -4,6 +4,7 @@ export { HistoricalService } from './historical.service';
 export { MeetingMinutesService } from './meeting-minutes.service';
 export { ModuleService } from './module.service';
 export { ObservationService } from "./observation.service";
+export { OrganizationService } from './organization.service';
 export { PermissionService } from './permission.service';
 export { RoleModulePermissionService } from './role-module-permission.service';
 export { RoleService } from './role.service';

@@ -38,9 +38,6 @@ export class UserEntity extends BaseEntity {
     @JoinColumn({ name: 'role_id' })
     role!: RoleEntity
 
-    @OneToMany(() => ActivityEntity, (activity) => activity.responsibleUser)
-    activity!: ActivityEntity
-
     @OneToMany(() => MeetingMinutesEntity, (activity) => activity.createdBy)
     meetingMinutesCreated!: MeetingMinutesEntity
 
@@ -48,11 +45,14 @@ export class UserEntity extends BaseEntity {
     meetingMinutesReviewed!: MeetingMinutesEntity
 
     @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.summoned)
-    summoned!: UserEntity[]
+    summonedToMeetingMinutes!: MeetingMinutesEntity[]
 
     @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.absent)
-    absent!: UserEntity[]
+    absentToMeetingMinutes!: MeetingMinutesEntity[]
 
     @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.guest)
-    guest!: UserEntity[]
+    guestToMeetingMinutes!: MeetingMinutesEntity[]
+
+    @ManyToMany(() => ActivityEntity, (activity) => activity.responsibleUsers)
+    activities!: ActivityEntity[]
 }

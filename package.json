@@ -15,6 +15,7 @@
         "typeorm": "typeorm-ts-node-esm -d ./src/config/data.config.ts",
         "m:gen": "npm run typeorm migration:generate",
         "m:run": "npm run typeorm migration:run",
+        "m:drop": "npm run typeorm schema:drop",
         "docker-compose": "docker-compose up -d",
         "docker-compose:logs": "docker-compose logs -f"
     },

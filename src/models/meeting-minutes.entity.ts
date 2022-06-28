@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany
 import { BaseEntity } from "../config";
 import { ActivityEntity } from "./activity.entity";
 import { AttachedFilesEntity } from "./attached-files.entity";
+import { OrganizationEntity } from "./organization.entity";
 import { SubjectAgendaItemEntity } from "./subject-agenda-item.entity";
 import { UserEntity } from "./user.entity";
 
@@ -14,8 +15,9 @@ export class MeetingMinutesEntity extends BaseEntity {
     @Column({ default: true })
     isRegular!: boolean
 
-    @Column()
-    organismCommitteeAreaProgram!: string
+    @ManyToOne(() => OrganizationEntity, (organization) => organization.meetingMinutes)
+    @JoinColumn({ name: `organization_committee_area_program` })
+    organizationCommitteeAreaProgram!: OrganizationEntity
 
     @Column()
     meetingPlace!: string
@@ -35,9 +37,6 @@ export class MeetingMinutesEntity extends BaseEntity {
     @OneToMany(() => ActivityEntity, (activity) => activity.meetingMinutes, { cascade: true })
     commitments!: ActivityEntity[]
 
-    @OneToMany(() => AttachedFilesEntity, (attached) => attached.meetingMinutes)
-    attachedFiles!: AttachedFilesEntity[]
-
     @ManyToOne(() => UserEntity, (user) => user.meetingMinutesCreated)
     @JoinColumn({ name: `produced_by_id` })
     createdBy!: UserEntity
@@ -46,7 +45,7 @@ export class MeetingMinutesEntity extends BaseEntity {
     @JoinColumn({ name: `reviewed_by_id` })
     reviewedBy!: UserEntity
 
-    @ManyToMany(() => UserEntity, (user) => user.summoned)
+    @ManyToMany(() => UserEntity, (user) => user.summonedToMeetingMinutes)
     @JoinTable({
         name: 'meeting_minutes_summoned',
         joinColumn: {
@@ -58,7 +57,7 @@ export class MeetingMinutesEntity extends BaseEntity {
     })
     summoned!: UserEntity[]
 
-    @ManyToMany(() => UserEntity, (user) => user.absent)
+    @ManyToMany(() => UserEntity, (user) => user.absentToMeetingMinutes)
     @JoinTable({
         name: 'meeting_minutes_absent',
         joinColumn: {
@@ -70,7 +69,7 @@ export class MeetingMinutesEntity extends BaseEntity {
     })
     absent!: UserEntity[]
 
-    @ManyToMany(() => UserEntity, (user) => user.guest)
+    @ManyToMany(() => UserEntity, (user) => user.guestToMeetingMinutes)
     @JoinTable({
         name: 'meeting_minutes_guest',
         joinColumn: {
@@ -81,4 +80,16 @@ export class MeetingMinutesEntity extends BaseEntity {
         }
     })
     guest!: UserEntity[]
+
+    @ManyToMany(() => AttachedFilesEntity, (attached) => attached.meetingMinutes)
+    @JoinTable({
+        name: `meeting_minutes_attached_files`,
+        joinColumn: {
+            name: `meeting_minutes_id`
+        },
+        inverseJoinColumn: {
+            name: `attached_file_id`
+        }
+    })
+    attachedFiles!: AttachedFilesEntity[]
 }

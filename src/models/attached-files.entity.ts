@@ -1,14 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToMany } from "typeorm";
 import { BaseEntity } from "../config";
 import { MeetingMinutesEntity } from './meeting-minutes.entity';
 
 
 @Entity({ name: `attached_files` })
 export class AttachedFilesEntity extends BaseEntity {
-    @ManyToOne(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.attachedFiles)
-    @JoinColumn({ name: 'meeting_minutes_id' })
-    meetingMinutes!: MeetingMinutesEntity
-
     @Column()
     internalFilename!: string
 
@@ -20,4 +16,7 @@ export class AttachedFilesEntity extends BaseEntity {
 
     @Column()
     author!: string
+
+    @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.attachedFiles)
+    meetingMinutes!: MeetingMinutesEntity[]
 }

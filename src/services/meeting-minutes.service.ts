@@ -21,11 +21,15 @@ export class MeetingMinutesService extends BaseService<MeetingMinutesEntity> {
         return (await this.execRepository).findOne({
             where: { id },
             relations: {
+                organizationCommitteeAreaProgram: true,
                 summoned: true,
                 absent: true,
                 guest: true,
                 subjectAgendaItems: true,
-                commitments: true,
+                commitments: {
+                    responsibleUsers: true,
+                    meetingMinutes: true
+                },
                 attachedFiles: true,
                 createdBy: true,
                 reviewedBy: true,

@@ -219,6 +219,12 @@ VALUES (
         'HISTORICAL',
         'Historical Module'
     );
+INSERT INTO `modules` (`id`, `module_name`, `module_description`)
+VALUES (
+        'organizations',
+        'ORGANIZATIONS',
+        'Historical Module'
+    );
 /* --------------------------------------------------------------- */
 /* Inserción para Roles */
 /* --------------------------------------------------------------- */
@@ -395,6 +401,28 @@ VALUES (
         'modules',
         'hard-delete'
     );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'organizations', 'create');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'organizations', 'read');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'organizations', 'update');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'organizations',
+        'soft-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'organizations', 'restore');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'organizations',
+        'hard-delete'
+    );
 -- Permisos para decano(a)
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'dean', 'users', 'create');
@@ -538,6 +566,18 @@ VALUES (
         'modules',
         'hard-delete'
     );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'create');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'read');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'update');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'soft-delete');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'restore');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'hard-delete');
 -- Permisos para docente
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'professor', 'users', 'create');
@@ -594,7 +634,7 @@ VALUES (uuid(), 'student', 'minutes-of-meeting', 'read');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'guest', 'minutes-of-meeting', 'read');
 /* --------------------------------------------------------------- */
-/* Inserción temporarl para developer */
+/* Inserción temporal para developer */
 /* --------------------------------------------------------------- */
 INSERT INTO `users`(
         `id`,
@@ -621,4 +661,30 @@ VALUES (
         "$2b$10$dSbyYv5ok9VBipMkTy7tDOXF5ZeIQCkygOzmiO3o0nl6VkyLH5/qG",
         "Desarrollador",
         "developer"
+    );
+INSERT INTO `users`(
+        `id`,
+        `created_at`,
+        `updated_at`,
+        `deleted_at`,
+        `name`,
+        `last_name`,
+        `username`,
+        `email`,
+        `password`,
+        `position`,
+        `role_id`
+    )
+VALUES (
+        (@i := uuid()),
+        DEFAULT,
+        DEFAULT,
+        DEFAULT,
+        "Usuario de prueba base",
+        "Test Base",
+        "test_base",
+        "test_base@gmail.com",
+        "$2b$10$dSbyYv5ok9VBipMkTy7tDOXF5ZeIQCkygOzmiO3o0nl6VkyLH5/qG",
+        "Prueba",
+        "professor"
     );

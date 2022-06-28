@@ -11,7 +11,13 @@ import { ConfigServer } from './config'
 // import { accessLoggerStream, loggerStream } from './helpers/logger.helper'
 import { AuthRouter } from './auth/router/auth.router'
 import {
-    MeetingMinutesRouter, ModuleRouter, PermissionRouter, RoleModulePermissionRouter, RoleRouter, UserRouter
+    MeetingMinutesRouter,
+    ModuleRouter,
+    OrganizationRouter,
+    PermissionRouter,
+    RoleModulePermissionRouter,
+    RoleRouter,
+    UserRouter
 } from './routes'
 
 
@@ -56,12 +62,13 @@ class ServerBootstrap extends ConfigServer {
     private _routers = (): express.Router[] => {
         return [
             new AuthRouter().router,
-            new UserRouter().router,
-            new RoleRouter().router,
+            new MeetingMinutesRouter().router,
             new ModuleRouter().router,
+            new OrganizationRouter().router,
             new PermissionRouter().router,
             new RoleModulePermissionRouter().router,
-            new MeetingMinutesRouter().router
+            new RoleRouter().router,
+            new UserRouter().router,
         ]
     }
 
