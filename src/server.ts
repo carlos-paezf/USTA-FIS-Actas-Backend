@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import cors from 'cors'
 import express from 'express'
 import morgan from 'morgan'
+import fileUpload from 'express-fileupload'
 // import morganBody from 'morgan-body'
 
 import { DataSource } from 'typeorm'
@@ -11,6 +12,7 @@ import { ConfigServer } from './config'
 // import { accessLoggerStream, loggerStream } from './helpers/logger.helper'
 import { AuthRouter } from './auth/router/auth.router'
 import {
+    AttachedFilesRouter,
     MeetingMinutesRouter,
     ModuleRouter,
     OrganizationRouter,
@@ -31,6 +33,31 @@ class ServerBootstrap extends ConfigServer {
     constructor() {
         super()
 
+        this._dbConnect()
+
+        this._middlewares()
+
+        this._app.use('/auth/', new AuthRouter().router)
+        this._app.use('/api/v1/', this._routers())
+
+        this._listen()
+    }
+
+
+    /** 
+     * A method that connects to the database.
+     */
+    private _dbConnect = async (): Promise<DataSource | void> => {
+        return this.dbConnection
+            .then(() => console.log(green.italic(`> Conexión establecida con la base de datos ${this.getEnvironment('DB_DATABASE')}`)))
+            .catch((error) => console.log(red.italic(`> Error intentando conectar la base de datos ${this.getEnvironment('DB_DATABASE')}`), error))
+    }
+
+
+    /**
+     * This function is used to set up the middlewares for the express application.
+     */
+    private _middlewares = (): void => {
         this._app.use(express.json())
         this._app.use(express.urlencoded({ extended: true }))
         this._app.use(morgan('common'))
@@ -46,13 +73,11 @@ class ServerBootstrap extends ConfigServer {
             stream: loggerStream
         }) */
         this._app.use(cors())
-
-        this._dbConnect()
-
-        this._app.use('/auth/', new AuthRouter().router)
-        this._app.use('/api/v1/', this._routers())
-
-        this._listen()
+        this._app.use(fileUpload({
+            useTempFiles: true,
+            tempFileDir: '/tmp/',
+            createParentPath: true
+        }))
     }
 
 
@@ -62,6 +87,7 @@ class ServerBootstrap extends ConfigServer {
     private _routers = (): express.Router[] => {
         return [
             new AuthRouter().router,
+            new AttachedFilesRouter().router,
             new MeetingMinutesRouter().router,
             new ModuleRouter().router,
             new OrganizationRouter().router,
@@ -70,15 +96,6 @@ class ServerBootstrap extends ConfigServer {
             new RoleRouter().router,
             new UserRouter().router,
         ]
-    }
-
-    /** 
-     * A method that connects to the database.
-     */
-    private _dbConnect = async (): Promise<DataSource | void> => {
-        return this.dbConnection
-            .then(() => console.log(green.italic(`> Conexión establecida con la base de datos ${this.getEnvironment('DB_DATABASE')}`)))
-            .catch((error) => console.log(red.italic(`> Error intentando conectar la base de datos ${this.getEnvironment('DB_DATABASE')}`), error))
     }
 
     /**

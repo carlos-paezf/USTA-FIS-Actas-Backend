@@ -1,3 +1,4 @@
+export { AttachedFilesMiddleware } from "./attached-files.middleware";
 export { MeetingMinutesMiddleware } from "./meeting-minutes.middleware";
 export { ModuleMiddleware } from './module.middleware';
 export { OrganizationMiddleware } from "./organization.middleware";

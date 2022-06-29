@@ -17,7 +17,7 @@ export class RoleModulePermissionController extends BaseController<RoleModulePer
             const [data, totalCount] = await this._service.findAllRolesModulesPermissions(
                 Number(from),
                 Number(limit),
-                String(order)
+                String(order).toUpperCase()
             )
 
             if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the search`)

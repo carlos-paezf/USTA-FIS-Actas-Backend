@@ -19,7 +19,7 @@ export class ModuleController extends BaseController<ModuleService> {
                 Number(from),
                 Number(limit),
                 Boolean(all),
-                String(order)
+                String(order).toUpperCase()
             )
 
             if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the search`)

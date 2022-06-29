@@ -15,7 +15,7 @@ export class OrganizationController extends BaseController<OrganizationService> 
             const { from = 0, limit = 10, all = false, order = 'ASC' } = req.query
 
             const [data, totalCount] = await this._service.findAllOrganizations(
-                Number(from), Number(limit), String(order), Boolean(all)
+                Number(from), Number(limit), String(order).toUpperCase(), Boolean(all)
             )
 
             if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the search`)
@@ -36,7 +36,7 @@ export class OrganizationController extends BaseController<OrganizationService> 
             const { from = 0, limit = 10, order = 'ASC' } = req.query
 
             const [data, totalCount] = await this._service.findAllDeletedOrganizations(
-                Number(from), Number(limit), String(order)
+                Number(from), Number(limit), String(order).toUpperCase()
             )
 
             if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the search`)
@@ -56,7 +56,7 @@ export class OrganizationController extends BaseController<OrganizationService> 
         try {
             const { name } = req.query
 
-            const { 0: data, 1: totalCount } = await this._service.searchOrganizationsByName(String(name))
+            const { 0: data, 1: totalCount } = await this._service.searchOrganizationsByName(String(name).toUpperCase())
 
             if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the name: '${name}'`)
 

@@ -148,6 +148,19 @@ VALUES (
         'HISTORICAL',
         'Historical Module'
     );
+);
+INSERT INTO `modules` (`id`, `module_name`, `module_description`)
+VALUES (
+        'organizations',
+        'ORGANIZATIONS',
+        'Organizations Module'
+    );
+INSERT INTO `modules` (`id`, `module_name`, `module_description`)
+VALUES (
+        'attached-files',
+        'ATTACHED FILES',
+        'Attached Files Module'
+    );
 /* --------------------------------------------------------------- */
 /* Inserción para Roles */
 /* --------------------------------------------------------------- */
@@ -326,6 +339,50 @@ VALUES (
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'developer', 'historical', 'read');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'organizations', 'create');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'organizations', 'read');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'organizations', 'update');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'organizations',
+        'soft-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'organizations', 'restore');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'organizations',
+        'hard-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'attached-files', 'create');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'attached-files', 'read');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'attached-files', 'update');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'attached-files',
+        'soft-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'developer', 'attached-files', 'restore');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'developer',
+        'attached-files',
+        'hard-delete'
+    );
 -- Permisos para decano(a)
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'dean', 'users', 'create');
@@ -471,6 +528,40 @@ VALUES (
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'dean', 'historical', 'read');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'create');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'read');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'update');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'soft-delete');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'restore');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'organizations', 'hard-delete');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'attached-files', 'create');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'attached-files', 'read');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'attached-files', 'update');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'attached-files',
+        'soft-delete'
+    );
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (uuid(), 'dean', 'attached-files', 'restore');
+INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
+VALUES (
+        uuid(),
+        'dean',
+        'attached-files',
+        'hard-delete'
+    );
 -- Permisos para docente
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'professor', 'users', 'create');

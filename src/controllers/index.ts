@@ -1,3 +1,4 @@
+export { AttachedFilesController } from './attached-files.controller';
 export { MeetingMinutesController } from "./meeting-minutes.controller";
 export { ModuleController } from './module.controller';
 export { OrganizationController } from "./organization.controller";

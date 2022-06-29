@@ -1,3 +1,4 @@
+export { AttachedFilesRouter } from './attached-files.router';
 export { HistoricalRouter } from "./historical.router";
 export { MeetingMinutesRouter } from "./meeting-minutes.router";
 export { ModuleRouter } from "./module.router";

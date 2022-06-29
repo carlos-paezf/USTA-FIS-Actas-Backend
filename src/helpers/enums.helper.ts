@@ -9,14 +9,15 @@ export enum RolesID {
 
 
 export enum ModulesID {
-    USERS = `users`,
-    ROLES = `roles`,
-    PERMISSIONS = `permissions`,
-    MINUTES_OF_MEETING = `minutes-of-meeting`,
-    ROLES_MODULES_PERMISSIONS = `roles-modules-permissions`,
-    MODULES = `modules`,
+    ATTACHED_FILES = `attached-files`,
     HISTORICAL = `historical`,
-    ORGANIZATIONS = `organizations`
+    MINUTES_OF_MEETING = `minutes-of-meeting`,
+    MODULES = `modules`,
+    ORGANIZATIONS = `organizations`,
+    PERMISSIONS = `permissions`,
+    ROLES = `roles`,
+    ROLES_MODULES_PERMISSIONS = `roles-modules-permissions`,
+    USERS = `users`
 }
 
 
