@@ -18,11 +18,22 @@ export class OrganizationService extends BaseService<OrganizationEntity> {
         })
     }
 
-    public async searchOrganizationsByName(organizationName: string, all: boolean): Promise<[OrganizationEntity[], number]> {
-        return (await this.execRepository).findAndCount({
-            where: { organizationName: String(new RegExp(organizationName, 'i')) },
-            withDeleted: (all) ? true : false
-        })
+    public async findAllDeletedOrganizations(from: number, limit: number, order: string): Promise<[OrganizationEntity[], number]> {
+        return (await this.execRepository)
+            .createQueryBuilder(`organization`)
+            .skip(from).take(limit)
+            .orderBy(`organization.organizationName`, (order === 'ASC') ? 'ASC' : 'DESC')
+            .where(`organization.deletedAt IS NOT NULL`)
+            .withDeleted()
+            .getManyAndCount()
+    }
+
+    public async searchOrganizationsByName(organizationName: string): Promise<[OrganizationEntity[], number]> {
+        return (await this.execRepository)
+            .createQueryBuilder(`organization`)
+            .where(`MATCH(organization.organizationName) AGAINST ('${organizationName}' IN BOOLEAN MODE)`)
+            .withDeleted()
+            .getManyAndCount()
     }
 
     public async findOneOrganizationById(id: string, deleted: boolean): Promise<OrganizationEntity | null> {
@@ -32,11 +43,12 @@ export class OrganizationService extends BaseService<OrganizationEntity> {
         })
     }
 
-    public async findOneOrganizationByName(organizationName: string, deleted: boolean): Promise<OrganizationEntity | null> {
-        return (await this.execRepository).findOne({
-            where: { organizationName },
-            withDeleted: (deleted) ? true : false
-        })
+    public async findOneOrganizationByName(organizationName: string): Promise<OrganizationEntity | null> {
+        return (await this.execRepository)
+            .createQueryBuilder(`organization`)
+            .where(`MATCH(organization.organizationName) AGAINST ('${organizationName}' IN BOOLEAN MODE)`)
+            .withDeleted()
+            .getOne()
     }
 
     public async saveOrganization(body: OrganizationDTO): Promise<OrganizationEntity> {

@@ -1,5 +1,5 @@
 import { Exclude } from "class-transformer";
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../config";
 import { ActivityEntity } from "./activity.entity";
 import { MeetingMinutesEntity } from "./meeting-minutes.entity";
@@ -15,9 +15,11 @@ import { RoleEntity } from "./role.entity";
  */
 @Entity({ name: `users` })
 export class UserEntity extends BaseEntity {
+    @Index({ fulltext: true })
     @Column()
     name!: string
 
+    @Index({ fulltext: true })
     @Column()
     lastName!: string
 

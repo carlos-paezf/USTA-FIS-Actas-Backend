@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../config";
 import { MeetingMinutesEntity } from "./meeting-minutes.entity";
 import { ObservationEntity } from "./observation.entity";
@@ -14,6 +14,7 @@ export enum FulfillmentType {
 
 @Entity({ name: `activity` })
 export class ActivityEntity extends BaseEntity {
+    @Index({ fulltext: true })
     @Column({ type: 'text' })
     nameActivity!: string
 

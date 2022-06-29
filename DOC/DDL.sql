@@ -66,15 +66,29 @@ CREATE TABLE `users` (
 ALTER TABLE `users`
 ADD CONSTRAINT `FK_a2cecd1a3531c0b041e29ba46e1` FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 -- Actas
-CREATE TABLE `attached_files` (
+DROP INDEX `IDX_e10bfbd4b8f0bdc8f363ab5757` ON `modules`;
+DROP INDEX `IDX_b990eff1fc3540798960d80e45` ON `permissions`;
+DROP INDEX `IDX_ac35f51a0f17e3e1fe12112603` ON `roles`;
+CREATE TABLE `observation` (
     `id` varchar(36) NOT NULL,
     `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     `deleted_at` timestamp(6) NULL,
-    `internal_filename` varchar(255) NOT NULL,
-    `public_filename` varchar(255) NOT NULL,
-    `file_location` varchar(255) NOT NULL,
-    `author` varchar(255) NOT NULL,
+    `observation` text NOT NULL,
+    `activity_id` varchar(36) NULL,
+    FULLTEXT INDEX `IDX_9b318438cd0f0adaaa079b1821` (`observation`),
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `activity` (
+    `id` varchar(36) NOT NULL,
+    `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    `deleted_at` timestamp(6) NULL,
+    `name_activity` text NOT NULL,
+    `activity_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `fulfillment` enum ('Yes', 'No', 'In Process') NOT NULL DEFAULT 'No',
+    `meeting_minutes_id` varchar(36) NULL,
+    FULLTEXT INDEX `IDX_f329d79279e4a52a691f1bd94a` (`name_activity`),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `organization` (
@@ -84,6 +98,7 @@ CREATE TABLE `organization` (
     `deleted_at` timestamp(6) NULL,
     `organization_type` enum ('ORGANIZATION', 'COMMITTEE', 'AREA', 'PROGRAM') NOT NULL DEFAULT 'COMMITTEE',
     `organization_name` varchar(255) NOT NULL,
+    FULLTEXT INDEX `IDX_84931e71beb141b1e131f80daa` (`organization_name`),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `subject_agenda_item` (
@@ -95,6 +110,8 @@ CREATE TABLE `subject_agenda_item` (
     `item_content` text NOT NULL,
     `item_development` text NOT NULL,
     `meeting_minutes_id` varchar(36) NULL,
+    FULLTEXT INDEX `IDX_8b3e22ef6559ff7c3a34b591be` (`item_content`),
+    FULLTEXT INDEX `IDX_bc21daf229d0993ff368055898` (`item_development`),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `meeting_minutes` (
@@ -113,24 +130,17 @@ CREATE TABLE `meeting_minutes` (
     `reviewed_by_id` varchar(36) NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
-CREATE TABLE `observation` (
+CREATE TABLE `attached_files` (
     `id` varchar(36) NOT NULL,
     `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     `deleted_at` timestamp(6) NULL,
-    `observation` text NOT NULL,
-    `activity_id` varchar(36) NULL,
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB;
-CREATE TABLE `activity` (
-    `id` varchar(36) NOT NULL,
-    `created_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    `updated_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-    `deleted_at` timestamp(6) NULL,
-    `name_activity` text NOT NULL,
-    `activity_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `fulfillment` enum ('Yes', 'No', 'In Process') NOT NULL DEFAULT 'No',
-    `meeting_minutes_id` varchar(36) NULL,
+    `internal_filename` varchar(255) NOT NULL,
+    `public_filename` varchar(255) NOT NULL,
+    `file_location` varchar(255) NOT NULL,
+    `author` varchar(255) NOT NULL,
+    FULLTEXT INDEX `IDX_9c7a153d6cf68320f6a94d7a10` (`public_filename`),
+    FULLTEXT INDEX `IDX_f5fa1cbc0bf37e84ebf3ac423b` (`author`),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `historical` (
@@ -144,6 +154,13 @@ CREATE TABLE `historical` (
     `module_id` varchar(255) NOT NULL,
     `permission_id` varchar(255) NOT NULL,
     PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `activity_user` (
+    `activity_id` varchar(36) NOT NULL,
+    `user_id` varchar(36) NOT NULL,
+    INDEX `IDX_2ddc32daa83050c92d30fc5951` (`activity_id`),
+    INDEX `IDX_f58708cacdf92d69494588003b` (`user_id`),
+    PRIMARY KEY (`activity_id`, `user_id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `meeting_minutes_summoned` (
     `meeting_minutes_id` varchar(36) NOT NULL,
@@ -173,13 +190,21 @@ CREATE TABLE `meeting_minutes_attached_files` (
     INDEX `IDX_55c7a73d30f891ea6b48fc9f1d` (`attached_file_id`),
     PRIMARY KEY (`meeting_minutes_id`, `attached_file_id`)
 ) ENGINE = InnoDB;
-CREATE TABLE `activity_user` (
-    `activity_id` varchar(36) NOT NULL,
-    `user_id` varchar(36) NOT NULL,
-    INDEX `IDX_2ddc32daa83050c92d30fc5951` (`activity_id`),
-    INDEX `IDX_f58708cacdf92d69494588003b` (`user_id`),
-    PRIMARY KEY (`activity_id`, `user_id`)
-) ENGINE = InnoDB;
+ALTER TABLE `modules`
+ADD UNIQUE INDEX `IDX_e10bfbd4b8f0bdc8f363ab5757` (`module_name`);
+ALTER TABLE `permissions`
+ADD UNIQUE INDEX `IDX_b990eff1fc3540798960d80e45` (`permission_name`);
+ALTER TABLE `roles`
+ADD UNIQUE INDEX `IDX_ac35f51a0f17e3e1fe12112603` (`role_name`);
+CREATE FULLTEXT INDEX `IDX_1b03064243f5ad7cf7e33fde36` ON `modules` (`module_description`);
+CREATE FULLTEXT INDEX `IDX_8b95ce6a04657709973209501b` ON `permissions` (`permission_description`);
+CREATE FULLTEXT INDEX `IDX_79e687de8b078c3f6556b93dba` ON `roles` (`role_description`);
+CREATE FULLTEXT INDEX `IDX_51b8b26ac168fbe7d6f5653e6c` ON `users` (`name`);
+CREATE FULLTEXT INDEX `IDX_0408cb491623b121499d4fa238` ON `users` (`last_name`);
+ALTER TABLE `observation`
+ADD CONSTRAINT `FK_80796f7bc479246d91c2bec73ed` FOREIGN KEY (`activity_id`) REFERENCES `activity`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `activity`
+ADD CONSTRAINT `FK_3a201029b6b1867b7cfb38403fe` FOREIGN KEY (`meeting_minutes_id`) REFERENCES `meeting_minutes`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE `subject_agenda_item`
 ADD CONSTRAINT `FK_45c486ba2cde8e66b978d24abcc` FOREIGN KEY (`meeting_minutes_id`) REFERENCES `meeting_minutes`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE `meeting_minutes`
@@ -188,10 +213,10 @@ ALTER TABLE `meeting_minutes`
 ADD CONSTRAINT `FK_0711faf421cc387657e2dabb5cf` FOREIGN KEY (`produced_by_id`) REFERENCES `users`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE `meeting_minutes`
 ADD CONSTRAINT `FK_16de00757a7c96ffd3f813ff04e` FOREIGN KEY (`reviewed_by_id`) REFERENCES `users`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE `observation`
-ADD CONSTRAINT `FK_80796f7bc479246d91c2bec73ed` FOREIGN KEY (`activity_id`) REFERENCES `activity`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE `activity`
-ADD CONSTRAINT `FK_3a201029b6b1867b7cfb38403fe` FOREIGN KEY (`meeting_minutes_id`) REFERENCES `meeting_minutes`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `activity_user`
+ADD CONSTRAINT `FK_2ddc32daa83050c92d30fc59513` FOREIGN KEY (`activity_id`) REFERENCES `activity`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `activity_user`
+ADD CONSTRAINT `FK_f58708cacdf92d69494588003be` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE `meeting_minutes_summoned`
 ADD CONSTRAINT `FK_2f32e787c9439340da330f41c7c` FOREIGN KEY (`meeting_minutes_id`) REFERENCES `meeting_minutes`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `meeting_minutes_summoned`
@@ -208,7 +233,3 @@ ALTER TABLE `meeting_minutes_attached_files`
 ADD CONSTRAINT `FK_40be30441a0203a33df70efca54` FOREIGN KEY (`meeting_minutes_id`) REFERENCES `meeting_minutes`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `meeting_minutes_attached_files`
 ADD CONSTRAINT `FK_55c7a73d30f891ea6b48fc9f1d3` FOREIGN KEY (`attached_file_id`) REFERENCES `attached_files`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE `activity_user`
-ADD CONSTRAINT `FK_2ddc32daa83050c92d30fc59513` FOREIGN KEY (`activity_id`) REFERENCES `activity`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `activity_user`
-ADD CONSTRAINT `FK_f58708cacdf92d69494588003be` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;

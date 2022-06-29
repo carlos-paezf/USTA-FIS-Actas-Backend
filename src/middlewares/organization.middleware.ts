@@ -2,6 +2,8 @@ import { SharedMiddleware } from "../shared/middlewares/shared.middleware";
 import { OrganizationService } from '../services/organization.service';
 import { NextFunction, Request, Response } from "express";
 import { red } from "colors";
+import { OrganizationDTO } from "../dtos";
+import { validate } from "class-validator";
 
 
 export class OrganizationMiddleware extends SharedMiddleware<OrganizationService> {
@@ -44,5 +46,27 @@ export class OrganizationMiddleware extends SharedMiddleware<OrganizationService
             console.log(red(`Error in UserMiddleware:idRestoreValidator: `), error)
             return this.httpResponse.InternalServerError(res, error)
         }
+    }
+
+    public organizationNameValidator = async (req: Request, res: Response, next: NextFunction) => {
+        const { organizationName } = req.body
+        const roleExists = await this._service.findOneOrganizationByName(organizationName.toUpperCase())
+
+        return (roleExists)
+            ? this.httpResponse.BadRequest(res, `The organization name '${organizationName}' is already being used`)
+            : next()
+    }
+
+    public organizationValidator = async (req: Request, res: Response, next: NextFunction) => {
+        const { organizationType, organizationName } = req.body
+
+        const valid = new OrganizationDTO()
+
+        valid.organizationType = organizationType
+        valid.organizationName = organizationName
+
+        validate(valid).then(async (error) => {
+            return error.length ? this.httpResponse.PreconditionFailed(res, error) : next()
+        })
     }
 }

@@ -31,14 +31,34 @@ export class OrganizationController extends BaseController<OrganizationService> 
         }
     }
 
+    public findAllDeletedOrganizations = async (req: Request, res: Response) => {
+        try {
+            const { from = 0, limit = 10, order = 'ASC' } = req.query
+
+            const [data, totalCount] = await this._service.findAllDeletedOrganizations(
+                Number(from), Number(limit), String(order)
+            )
+
+            if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the search`)
+
+            return this._httpResponse.Ok(res, {
+                from, limit, order,
+                partialCount: data.length, totalCount,
+                data
+            })
+        } catch (error) {
+            console.log(red(`Error in OrganizationController:findAllOrganizations: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
     public searchOrganizationsByName = async (req: Request, res: Response) => {
         try {
-            const { name } = req.params
-            const { all = false } = req.query
+            const { name } = req.query
 
-            const { 0: data, 1: totalCount } = await this._service.searchOrganizationsByName(String(name), Boolean(all))
+            const { 0: data, 1: totalCount } = await this._service.searchOrganizationsByName(String(name))
 
-            if (!data) return this._httpResponse.NotFound(res, `There are no results for the name: '${name}'`)
+            if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the name: '${name}'`)
 
             return this._httpResponse.Ok(res, {
                 name, totalCount, data
@@ -57,22 +77,6 @@ export class OrganizationController extends BaseController<OrganizationService> 
             const data = await this._service.findOneOrganizationById(id, Boolean(deleted))
 
             if (!data) return this._httpResponse.NotFound(res, `There are no results for the id: '${id}'`)
-
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error un OrganizationController:findOneOrganizationById: `), error)
-            return this._httpResponse.InternalServerError(res, error)
-        }
-    }
-
-    public findOneOrganizationByName = async (req: Request, res: Response) => {
-        try {
-            const { name } = req.params
-            const { deleted = false } = req.query
-
-            const data = await this._service.findOneOrganizationByName(name, Boolean(deleted))
-
-            if (!data) return this._httpResponse.NotFound(res, `There are no results for the name: '${name}'`)
 
             return this._httpResponse.Ok(res, data)
         } catch (error) {

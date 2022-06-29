@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany } from "typeorm";
+import { Column, Entity, Index, ManyToMany } from "typeorm";
 import { BaseEntity } from "../config";
 import { MeetingMinutesEntity } from './meeting-minutes.entity';
 
@@ -8,12 +8,14 @@ export class AttachedFilesEntity extends BaseEntity {
     @Column()
     internalFilename!: string
 
+    @Index({ fulltext: true })
     @Column()
     publicFilename!: string
 
     @Column()
     fileLocation!: string
 
+    @Index({ fulltext: true })
     @Column()
     author!: string
 

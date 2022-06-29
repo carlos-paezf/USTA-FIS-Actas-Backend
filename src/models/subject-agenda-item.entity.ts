@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import { BaseEntity } from "../config";
 import { MeetingMinutesEntity } from "./meeting-minutes.entity";
 
@@ -12,9 +12,11 @@ export class SubjectAgendaItemEntity extends BaseEntity {
     @Column()
     itemNumber!: number
 
+    @Index({ fulltext: true })
     @Column({ type: 'text' })
     itemContent!: string
 
+    @Index({ fulltext: true })
     @Column({ type: 'text' })
     itemDevelopment!: string
 }

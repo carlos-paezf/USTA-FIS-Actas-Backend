@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import { BaseEntity } from "../config";
 import { ActivityEntity } from "./activity.entity";
 
@@ -9,6 +9,7 @@ export class ObservationEntity extends BaseEntity {
     @JoinColumn({ name: `activity_id` })
     activity!: ActivityEntity
 
+    @Index({ fulltext: true })
     @Column({ type: 'text' })
     observation!: string
 }

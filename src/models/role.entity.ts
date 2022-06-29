@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, Index, OneToMany } from "typeorm";
 import { BaseEntity } from "../config";
 import { RoleModulePermissionEntity } from "./role-module-permission.entity";
 import { UserEntity } from "./user.entity";
@@ -11,9 +11,11 @@ import { UserEntity } from "./user.entity";
  */
 @Entity({ name: `roles` })
 export class RoleEntity extends BaseEntity {
+    @Index({ fulltext: true })
     @Column({ unique: true, nullable: false })
     roleName!: string
 
+    @Index({ fulltext: true })
     @Column({ nullable: true })
     roleDescription!: string
 
