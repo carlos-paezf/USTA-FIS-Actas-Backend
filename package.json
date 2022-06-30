@@ -32,6 +32,7 @@
     "homepage": "https://github.com/carlos-paezf/USTA-FIS-Actas-Backend#readme",
     "dependencies": {
         "@slack/webhook": "^6.1.0",
+        "@types/uuid": "^8.3.4",
         "bcrypt": "^5.0.1",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.13.2",
@@ -52,7 +53,8 @@
         "reflect-metadata": "^0.1.13",
         "typeorm": "^0.3.6",
         "typeorm-naming-strategies": "^4.1.0",
-        "typescript": "^4.7.4"
+        "typescript": "^4.7.4",
+        "uuid": "^8.3.2"
     },
     "devDependencies": {
         "@types/bcrypt": "^5.0.0",

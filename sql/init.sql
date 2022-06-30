@@ -10,6 +10,7 @@ CREATE TABLE `roles` (
     `role_name` varchar(255) NOT NULL,
     `role_description` varchar(255) NULL,
     UNIQUE INDEX `IDX_ac35f51a0f17e3e1fe12112603` (`role_name`),
+    FULLTEXT INDEX `IDX_79e687de8b078c3f6556b93dba` (`role_description`),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `modules` (
@@ -20,6 +21,7 @@ CREATE TABLE `modules` (
     `module_name` varchar(255) NOT NULL,
     `module_description` varchar(255) NOT NULL,
     UNIQUE INDEX `IDX_e10bfbd4b8f0bdc8f363ab5757` (`module_name`),
+    FULLTEXT INDEX `IDX_1b03064243f5ad7cf7e33fde36` (`module_description`),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `permissions` (
@@ -30,6 +32,7 @@ CREATE TABLE `permissions` (
     `permission_name` varchar(255) NOT NULL,
     `permission_description` varchar(255) NOT NULL,
     UNIQUE INDEX `IDX_b990eff1fc3540798960d80e45` (`permission_name`),
+    FULLTEXT INDEX `IDX_8b95ce6a04657709973209501b` (`permission_description`),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `roles_modules_permissions` (
@@ -65,6 +68,8 @@ CREATE TABLE `users` (
     `role_id` varchar(36) NULL,
     UNIQUE INDEX `IDX_fe0bb3f6520ee0469504521e71` (`username`),
     UNIQUE INDEX `IDX_97672ac88f789774dd47f7c8be` (`email`),
+    FULLTEXT INDEX `IDX_51b8b26ac168fbe7d6f5653e6c` (`name`),
+    FULLTEXT INDEX `IDX_0408cb491623b121499d4fa238` (`last_name`),
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 ALTER TABLE `users`

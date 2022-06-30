@@ -1,15 +1,17 @@
 import { Request, Response } from "express";
 import { BaseController } from "../config";
-import { MeetingMinutesService, UserService } from "../services";
+import { AttachedFilesService, MeetingMinutesService, UserService } from "../services";
 import { red } from 'colors';
 
 
 export class MeetingMinutesController extends BaseController<MeetingMinutesService> {
     private _userService: UserService
+    private _attachedFiles: AttachedFilesService
 
     constructor() {
         super(MeetingMinutesService)
         this._userService = new UserService()
+        this._attachedFiles = new AttachedFilesService()
     }
 
     public findAllMeetingMinutes = async (req: Request, res: Response) => {
@@ -50,7 +52,7 @@ export class MeetingMinutesController extends BaseController<MeetingMinutesServi
 
     public createMeetingMinutes = async (req: Request, res: Response) => {
         try {
-            const { summoned, absent, guest } = req.body
+            const { summoned, absent, guest, attachedFiles, commitments } = req.body
 
             let summonedUsers
             if (summoned.length) {
@@ -70,8 +72,21 @@ export class MeetingMinutesController extends BaseController<MeetingMinutesServi
                 if (!guestUsers.length) return this._httpResponse.BadRequest(res, `The users indicated as guest have not been found`)
             }
 
+            let files
+            if (attachedFiles.length) {
+                files = await this._attachedFiles.findAttachedFilesByIds(Array.from(new Set(attachedFiles)))
+                if (!files.length) return this._httpResponse.BadRequest(res, `The attached files have not been found`)
+            }
+
+            const commitmentsSend = []
+            for (const activity of commitments) {
+                const usersActivity = await this._userService.findUsersByIds(Array.from(new Set(activity.responsibleUsers)))
+                if (!usersActivity.length) return this._httpResponse.BadRequest(res, `There are no people responsible for the activity "${activity.nameActivity}"`)
+                commitmentsSend.push({ ...activity, responsibleUsers: usersActivity })
+            }
+
             const meetingMinutes = await this._service.saveMeetingMinutes({
-                ...req.body, summoned: summonedUsers, absent: absentUsers, guest: guestUsers,
+                ...req.body, summoned: summonedUsers, absent: absentUsers, guest: guestUsers, attachedFiles: files, commitments: commitmentsSend
             })
 
             return this._httpResponse.Created(res, meetingMinutes)

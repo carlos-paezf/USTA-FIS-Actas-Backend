@@ -1,10 +1,13 @@
 import { BaseService } from "../config";
 import { AttachedFilesDTO } from "../dtos";
 import { AttachedFilesEntity } from "../models";
-import { DeleteResult, UpdateResult } from 'typeorm';
+import { DeleteResult, In, UpdateResult } from 'typeorm';
 
 
 export class AttachedFilesService extends BaseService<AttachedFilesEntity> {
+    private PUBLIC_URL = this.getEnvironment('PUBLIC_URL')
+    private PORT = this.getEnvironment('PORT')
+
     constructor() {
         super(AttachedFilesEntity)
     }
@@ -28,6 +31,10 @@ export class AttachedFilesService extends BaseService<AttachedFilesEntity> {
             .getManyAndCount()
     }
 
+    public async findAttachedFilesByIds(arrayIds: string[]): Promise<AttachedFilesEntity[]> {
+        return (await this.execRepository).findBy({ id: In(arrayIds) })
+    }
+
     public async searchAttachedFiles(filename: string, author: string): Promise<[AttachedFilesEntity[], number]> {
         return (await this.execRepository)
             .createQueryBuilder(`attachedFiles`)
@@ -45,7 +52,9 @@ export class AttachedFilesService extends BaseService<AttachedFilesEntity> {
     }
 
     public async uploadAttachedFile(body: AttachedFilesDTO): Promise<AttachedFilesEntity> {
-        return (await this.execRepository).save(body)
+        const newFile = (await this.execRepository).create(body)
+        const fileLocation = `${this.PUBLIC_URL}:${this.PORT}/${newFile.fileLocation}`
+        return (await this.execRepository).save({ ...newFile, fileLocation })
     }
 
     public async softDeleteAttachedFileById(id: string): Promise<DeleteResult> {

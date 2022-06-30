@@ -1,17 +1,24 @@
-import { IsNotEmpty, IsOptional } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 import { BaseDTO } from "../config";
+import { UserEntity } from "../models";
 
 
 export class AttachedFilesDTO extends BaseDTO {
-    @IsOptional()
-    internalFilename?: string
+    @IsNotEmpty()
+    internalFilename!: string
 
     @IsNotEmpty()
     publicFilename!: string
 
-    @IsOptional()
-    fileLocation?: string
+    @IsNotEmpty()
+    fileLocation!: string
 
     @IsNotEmpty()
-    author!: string
+    author!: UserEntity
+
+    @IsNotEmpty()
+    mimetype!: string
+
+    @IsNotEmpty()
+    size!: number
 }

@@ -2,7 +2,6 @@ import 'reflect-metadata'
 import cors from 'cors'
 import express from 'express'
 import morgan from 'morgan'
-import fileUpload from 'express-fileupload'
 // import morganBody from 'morgan-body'
 
 import { DataSource } from 'typeorm'
@@ -73,11 +72,7 @@ class ServerBootstrap extends ConfigServer {
             stream: loggerStream
         }) */
         this._app.use(cors())
-        this._app.use(fileUpload({
-            useTempFiles: true,
-            tempFileDir: '/tmp/',
-            createParentPath: true
-        }))
+        this._app.use(express.static(`../storage`))
     }
 
 

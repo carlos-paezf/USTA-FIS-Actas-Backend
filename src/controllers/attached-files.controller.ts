@@ -1,10 +1,15 @@
 import { red } from "colors";
 import { Request, Response } from "express";
+import { TokenPayload } from "../auth/types/auth.interface";
+
 import { BaseController } from "../config";
+import { AttachedFilesEntity } from "../models";
 import { AttachedFilesService } from "../services";
 
 
 export class AttachedFilesController extends BaseController<AttachedFilesService> {
+
+
     constructor() {
         super(AttachedFilesService)
     }
@@ -89,9 +94,31 @@ export class AttachedFilesController extends BaseController<AttachedFilesService
 
     public uploadAttachedFiles = async (req: Request, res: Response) => {
         try {
-            // TODO: Carga de archivos
-            console.log(req.file)
-            return this._httpResponse.Ok(res, {})
+            // eslint-disable-next-line
+            const upload: any = req.files
+            const user = req.user as TokenPayload
+
+            if (!user) return this._httpResponse.Forbidden(res, `You do not have permissions for this action`)
+
+            if (!upload) return this._httpResponse.BadRequest(res, `The 'attached_files' property must be sent in the form-data`)
+            if (!upload.length) return this._httpResponse.BadRequest(res, `Please choose files`)
+
+            // eslint-disable-next-line
+            const data: any = []
+
+            for (const { originalname, mimetype, filename, size } of upload) {
+                const body: unknown = {
+                    internalFilename: filename,
+                    publicFilename: originalname,
+                    fileLocation: filename,
+                    author: user.id,
+                    mimetype,
+                    size
+                }
+                data.push(await this._service.uploadAttachedFile(body as AttachedFilesEntity))
+            }
+
+            return this._httpResponse.Created(res, { data })
         } catch (error) {
             console.log(red(`Error in AttachedFilesController:uploadAttachedFiles: `), error)
             return this._httpResponse.InternalServerError(res, error)

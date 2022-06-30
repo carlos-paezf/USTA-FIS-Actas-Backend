@@ -49,8 +49,9 @@ export class AttachedFilesRouter extends BaseRouter<AttachedFilesController, Att
         this.router.post(
             `/attached-files`,
             [
-                // this.middleware.validateJWT,
-                // this.middleware.checkRoleModulePermission(ModulesID.ATTACHED_FILES, PermissionsID.CREATE)
+                this.middleware.validateJWT,
+                this.middleware.checkRoleModulePermission(ModulesID.ATTACHED_FILES, PermissionsID.CREATE),
+                this.middleware.uploadFilesMiddleware
             ],
             this.controller.uploadAttachedFiles
         )

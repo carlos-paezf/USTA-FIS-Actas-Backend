@@ -1,6 +1,7 @@
-import { Column, Entity, Index, ManyToMany } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToMany, ManyToOne } from "typeorm";
 import { BaseEntity } from "../config";
 import { MeetingMinutesEntity } from './meeting-minutes.entity';
+import { UserEntity } from "./user.entity";
 
 
 @Entity({ name: `attached_files` })
@@ -17,7 +18,14 @@ export class AttachedFilesEntity extends BaseEntity {
 
     @Index({ fulltext: true })
     @Column()
-    author!: string
+    mimetype!: string
+
+    @Column()
+    size!: number
+
+    @ManyToOne(() => UserEntity, (user) => user.attachedFiles)
+    @JoinColumn({ name: `user_id` })
+    author!: UserEntity
 
     @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.attachedFiles)
     meetingMinutes!: MeetingMinutesEntity[]

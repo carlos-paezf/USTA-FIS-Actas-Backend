@@ -28,9 +28,12 @@ export class MeetingMinutesService extends BaseService<MeetingMinutesEntity> {
                 subjectAgendaItems: true,
                 commitments: {
                     responsibleUsers: true,
+                    observations: true,
                     meetingMinutes: true
                 },
-                attachedFiles: true,
+                attachedFiles: {
+                    author: true
+                },
                 createdBy: true,
                 reviewedBy: true,
             },

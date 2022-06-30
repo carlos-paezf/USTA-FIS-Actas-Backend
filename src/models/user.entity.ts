@@ -4,6 +4,7 @@ import { BaseEntity } from "../config";
 import { ActivityEntity } from "./activity.entity";
 import { MeetingMinutesEntity } from "./meeting-minutes.entity";
 import { RoleEntity } from "./role.entity";
+import { AttachedFilesEntity } from './attached-files.entity';
 
 
 /** 
@@ -45,6 +46,9 @@ export class UserEntity extends BaseEntity {
 
     @OneToMany(() => MeetingMinutesEntity, (activity) => activity.reviewedBy)
     meetingMinutesReviewed!: MeetingMinutesEntity
+
+    @OneToMany(() => AttachedFilesEntity, (files) => files.author)
+    attachedFiles!: AttachedFilesEntity[]
 
     @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.summoned)
     summonedToMeetingMinutes!: MeetingMinutesEntity[]
