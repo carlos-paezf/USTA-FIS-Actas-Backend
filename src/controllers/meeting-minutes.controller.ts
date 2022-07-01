@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
+import { red } from 'colors';
+
 import { BaseController } from "../config";
 import { AttachedFilesService, MeetingMinutesService, UserService } from "../services";
-import { red } from 'colors';
+import { ActivityEntity, AttachedFilesEntity, UserEntity } from "../models";
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 
 export class MeetingMinutesController extends BaseController<MeetingMinutesService> {
@@ -54,34 +57,62 @@ export class MeetingMinutesController extends BaseController<MeetingMinutesServi
         try {
             const { summoned, absent, guest, attachedFiles, commitments } = req.body
 
-            let summonedUsers
+            const summonedUsers: UserEntity[] = []
             if (summoned.length) {
-                summonedUsers = await this._userService.findUsersByIds(Array.from(new Set(summoned)))
-                if (!summonedUsers.length) return this._httpResponse.BadRequest(res, `The users indicated as summoned have not been found`)
+                for (const userId of Array.from(new Set(summoned))) {
+                    const user = await this._userService.findOneUserById(String(userId))
+                    if (!user) {
+                        return this._httpResponse.BadRequest(res, `The user with the id '${userId}' indicated as summoned has not been found`)
+                    }
+                    summonedUsers.push(user)
+                }
             }
 
-            let absentUsers
+            const absentUsers: UserEntity[] = []
             if (absent.length) {
-                absentUsers = await this._userService.findUsersByIds(Array.from(new Set(absent)))
-                if (!absentUsers.length) return this._httpResponse.BadRequest(res, `The users indicated as absent have not been found`)
+                for (const userId of Array.from(new Set(absent))) {
+                    const user = await this._userService.findOneUserById(String(userId))
+                    if (!user) {
+                        return this._httpResponse.BadRequest(res, `The user with the id '${userId}' indicated as absent has not been found`)
+                    }
+                    absentUsers.push(user)
+                }
             }
 
-            let guestUsers
+            const guestUsers: UserEntity[] = []
             if (guest.length) {
-                guestUsers = await this._userService.findUsersByIds(Array.from(new Set(guest)))
-                if (!guestUsers.length) return this._httpResponse.BadRequest(res, `The users indicated as guest have not been found`)
+                for (const userId of Array.from(new Set(guest))) {
+                    const user = await this._userService.findOneUserById(String(userId))
+                    if (!user) {
+                        return this._httpResponse.BadRequest(res, `The user with the id '${userId}' indicated as guest has not been found`)
+                    }
+                    guestUsers.push(user)
+                }
             }
 
-            let files
+            const files: AttachedFilesEntity[] = []
             if (attachedFiles.length) {
-                files = await this._attachedFiles.findAttachedFilesByIds(Array.from(new Set(attachedFiles)))
-                if (!files.length) return this._httpResponse.BadRequest(res, `The attached files have not been found`)
+                for (const fileId of Array.from(new Set(attachedFiles))) {
+                    const file = await this._attachedFiles.findOneAttachedFileById(String(fileId))
+                    if (!file) {
+                        return this._httpResponse.BadRequest(res, `File with id '${fileId}' does not exist`)
+                    }
+                    files.push(file)
+                }
             }
 
-            const commitmentsSend = []
+            const commitmentsSend: ActivityEntity[] = []
             for (const activity of commitments) {
-                const usersActivity = await this._userService.findUsersByIds(Array.from(new Set(activity.responsibleUsers)))
-                if (!usersActivity.length) return this._httpResponse.BadRequest(res, `There are no people responsible for the activity "${activity.nameActivity}"`)
+                const usersActivity: UserEntity[] = []
+
+                for (const userId of Array.from(new Set(activity.responsibleUsers))) {
+                    const user = await this._userService.findOneUserById(String(userId))
+                    if (!user) {
+                        return this._httpResponse.BadRequest(res, `The user with the id '${userId}' indicated as responsible for the activity '${activity.nameActivity}' has not been found`)
+                    }
+                    usersActivity.push(user)
+                }
+
                 commitmentsSend.push({ ...activity, responsibleUsers: usersActivity })
             }
 
@@ -92,6 +123,131 @@ export class MeetingMinutesController extends BaseController<MeetingMinutesServi
             return this._httpResponse.Created(res, meetingMinutes)
         } catch (error) {
             console.log(red(`Error in MeetingMinutesController:createMeetingMinutes: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public updateMeetingMinutesById = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+            const { summoned, absent, guest, attachedFiles, commitments } = req.body
+
+            const summonedUsers: UserEntity[] = []
+            if (summoned.length) {
+                for (const userId of Array.from(new Set(summoned))) {
+                    const user = await this._userService.findOneUserById(String(userId))
+                    if (!user) {
+                        return this._httpResponse.BadRequest(res, `The user with the id '${userId}' indicated as summoned has not been found`)
+                    }
+                    summonedUsers.push(user)
+                }
+            }
+
+            const absentUsers: UserEntity[] = []
+            if (absent.length) {
+                for (const userId of Array.from(new Set(absent))) {
+                    const user = await this._userService.findOneUserById(String(userId))
+                    if (!user) {
+                        return this._httpResponse.BadRequest(res, `The user with the id '${userId}' indicated as absent has not been found`)
+                    }
+                    absentUsers.push(user)
+                }
+            }
+
+            const guestUsers: UserEntity[] = []
+            if (guest.length) {
+                for (const userId of Array.from(new Set(guest))) {
+                    const user = await this._userService.findOneUserById(String(userId))
+                    if (!user) {
+                        return this._httpResponse.BadRequest(res, `The user with the id '${userId}' indicated as guest has not been found`)
+                    }
+                    guestUsers.push(user)
+                }
+            }
+
+            const files: AttachedFilesEntity[] = []
+            if (attachedFiles.length) {
+                for (const fileId of Array.from(new Set(attachedFiles))) {
+                    const file = await this._attachedFiles.findOneAttachedFileById(String(fileId))
+                    if (!file) {
+                        return this._httpResponse.BadRequest(res, `File with id '${fileId}' does not exist`)
+                    }
+                    files.push(file)
+                }
+            }
+
+            const commitmentsSend: ActivityEntity[] = []
+            for (const activity of commitments) {
+                const usersActivity: UserEntity[] = []
+
+                for (const userId of Array.from(new Set(activity.responsibleUsers))) {
+                    const user = await this._userService.findOneUserById(String(userId))
+                    if (!user) {
+                        return this._httpResponse.BadRequest(res, `The user with the id '${userId}' indicated as responsible for the activity '${activity.nameActivity}' has not been found`)
+                    }
+                    usersActivity.push(user)
+                }
+
+                commitmentsSend.push({ ...activity, responsibleUsers: usersActivity })
+            }
+
+            const data = await this._service.updateMeetingMinutesById(id, {
+                ...req.body, summoned: summonedUsers, absent: absentUsers, guest: guestUsers, attachedFiles: files, commitments: commitmentsSend
+            })
+
+            if (!data) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+
+            // eslint-disable-next-line
+        } catch (error: any) {
+            console.log(red(`Error in MeetingMinutesController:updateMeetingMinutesById: `), error)
+            return this._httpResponse.InternalServerError(res, error.message)
+        }
+    }
+
+    public softDeleteMeetingMinutesById = async (req: Request, res: Response) => {
+        try {
+            const { idDisabled } = req.params
+
+            const data: DeleteResult = await this._service.softDeleteMeetingMinutesById(idDisabled)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in MeetingMinutesController:softDeleteMeetingMinutesById: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public restoreMeetingMinutesById = async (req: Request, res: Response) => {
+        try {
+            const { idEnabled } = req.params
+
+            const data: UpdateResult = await this._service.restoreMeetingMinutesById(idEnabled)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in MeetingMinutesController:restoreMeetingMinutesById: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public destroyMeetingMinutesById = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+
+            // eslint-disable-next-line
+            const data: any = await this._service.destroyMeetingMinutesById(id)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in MeetingMinutesController:destroyMeetingMinutes: `), error)
             return this._httpResponse.InternalServerError(res, error)
         }
     }

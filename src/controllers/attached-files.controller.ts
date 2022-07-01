@@ -58,17 +58,16 @@ export class AttachedFilesController extends BaseController<AttachedFilesService
 
     public searchAttachedFiles = async (req: Request, res: Response) => {
         try {
-            const { filename = '', author = '' } = req.query
+            const { filename = '', mimetype = '' } = req.query
 
             const { 0: data, 1: totalCount } = await this._service.searchAttachedFiles(
-                String(filename).toUpperCase(), String(author).toUpperCase()
+                String(filename).toUpperCase(), String(mimetype).toUpperCase()
             )
 
-            if (!data.length) return this._httpResponse.NotFound(res, `No results were found for the queried values: filename: '${filename}', author '${author}'`)
+            if (!data.length) return this._httpResponse.NotFound(res, `No results were found for the queried values: filename: '${filename}', mimetype: ${mimetype}`)
 
             return this._httpResponse.Ok(res, {
-                filename, author,
-                totalCount, data
+                filename, mimetype, totalCount, data
             })
         } catch (error) {
             console.log(red(`Error in AttachedFilesController:searchAttachedFiles: `), error)

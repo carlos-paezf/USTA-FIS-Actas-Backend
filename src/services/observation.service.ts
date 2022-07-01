@@ -1,6 +1,7 @@
-import { DeleteResult, UpdateResult } from "typeorm";
+import { red } from "colors";
+
 import { BaseService } from "../config";
-import { ObservationDTO } from "../dtos";
+import { CustomError } from "../helpers/custom-error.helper";
 import { ObservationEntity } from "../models";
 
 
@@ -9,31 +10,43 @@ export class ObservationService extends BaseService<ObservationEntity> {
         super(ObservationEntity)
     }
 
-    public async findAllObservationsByActivityId(activityId: string): Promise<[ObservationEntity[], number]> {
+    // eslint-disable-next-line
+    public async removeRelationship(observation: ObservationEntity, columnRelation: string): Promise<void> {
+        try {
+            const relationship = (await this.execRepository)
+                .createQueryBuilder()
+                .relation(ObservationEntity, columnRelation)
+                .of(observation)
+                .loadMany();
+
+            (await this.execRepository)
+                .createQueryBuilder()
+                .relation(ObservationEntity, columnRelation)
+                .of(observation)
+                .remove(await relationship);
+            // eslint-disable-next-line
+        } catch (error: any) {
+            console.log(red(`Error in MeetingMinutesService:addAndRemoveRelationship: `), error)
+            throw new CustomError(`RemoveRelationship`, error.message, `RemoveRelationship`)
+        }
+    }
+
+    public async destroyNullObservations() {
+        const observationsNull = await (
+            (await this.execRepository)
+                .createQueryBuilder(`observation`)
+                .where(`observation.activity IS NULL`)
+                .getMany()
+        )
+
+        for (const observation of observationsNull) {
+            await this.removeRelationship(observation, `activity`)
+        }
+
         return (await this.execRepository)
-            .createQueryBuilder(`observation`)
-            .where(`observation.activity = :activityId`, { activityId })
-            .leftJoin(`observation.activity`, `activity`)
-            .getManyAndCount()
-    }
-
-    public async createObservation(body: ObservationDTO): Promise<ObservationEntity> {
-        return (await this.execRepository).save(body)
-    }
-
-    public async updateObservationById(id: string, infoUpdate: ObservationDTO): Promise<UpdateResult> {
-        return (await this.execRepository).update(id, { ...infoUpdate, updatedAt: new Date() })
-    }
-
-    public async softDeleteObservationById(id: string): Promise<DeleteResult> {
-        return (await this.execRepository).softDelete(id)
-    }
-
-    public async restoreObservationById(id: string): Promise<UpdateResult> {
-        return (await this.execRepository).restore(id)
-    }
-
-    public async destroyObservationById(id: string): Promise<DeleteResult> {
-        return (await this.execRepository).delete(id)
+            .createQueryBuilder()
+            .where(`activity IS NULL`)
+            .delete()
+            .execute()
     }
 }

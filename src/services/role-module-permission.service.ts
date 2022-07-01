@@ -78,4 +78,14 @@ export class RoleModulePermissionService extends BaseService<RoleModulePermissio
             // .leftJoinAndSelect('roleModulePermission.permission', 'permission', 'permission.id = :permissionId', { permissionId })
             .getOne()
     }
+
+    public async findModulesPermissionsByRole(roleId: string): Promise<RoleModulePermissionEntity[]> {
+        return (await this.execRepository)
+            .createQueryBuilder(`roleModulePermission`)
+            .where('roleModulePermission.role = :roleId', { roleId })
+            .leftJoin('roleModulePermission.role', 'role', 'role.id = :roleId', { roleId })
+            .leftJoinAndSelect('roleModulePermission.module', 'module')
+            .leftJoinAndSelect('roleModulePermission.permission', 'permission')
+            .getMany()
+    }
 }

@@ -1,7 +1,8 @@
+import { red } from "colors";
+
 import { BaseService } from "../config";
-import { SubjectAgendaItemDTO } from "../dtos";
 import { SubjectAgendaItemEntity } from "../models";
-import { UpdateResult, DeleteResult } from 'typeorm';
+import { CustomError } from "../helpers/custom-error.helper";
 
 
 export class SubjectAgendaItemService extends BaseService<SubjectAgendaItemEntity> {
@@ -9,29 +10,43 @@ export class SubjectAgendaItemService extends BaseService<SubjectAgendaItemEntit
         super(SubjectAgendaItemEntity)
     }
 
-    public async findAllSubjectAgendaItemsByMeetingMinutesId(meetingMinutesId: string): Promise<[SubjectAgendaItemEntity[], number]> {
+    // eslint-disable-next-line
+    public async removeRelationship(subjectAgendaItem: SubjectAgendaItemEntity, columnRelation: string): Promise<void> {
+        try {
+            const relationship = (await this.execRepository)
+                .createQueryBuilder()
+                .relation(SubjectAgendaItemEntity, columnRelation)
+                .of(subjectAgendaItem)
+                .loadMany();
+
+            (await this.execRepository)
+                .createQueryBuilder()
+                .relation(SubjectAgendaItemEntity, columnRelation)
+                .of(subjectAgendaItem)
+                .remove(await relationship);
+            // eslint-disable-next-line
+        } catch (error: any) {
+            console.log(red(`Error in MeetingMinutesService:addAndRemoveRelationship: `), error)
+            throw new CustomError(`RemoveRelationship`, error.message, `RemoveRelationship`)
+        }
+    }
+
+    public async destroyNullSubjectAgendaItems() {
+        const subjectAgendaItemsNull = await (
+            (await this.execRepository)
+                .createQueryBuilder(`subjectAgendaItem`)
+                .where(`subjectAgendaItem.meetingMinutes IS NULL`)
+                .getMany()
+        )
+
+        for (const subjectAgendaItem of subjectAgendaItemsNull) {
+            await this.removeRelationship(subjectAgendaItem, `meetingMinutes`)
+        }
+
         return (await this.execRepository)
-            .createQueryBuilder(`subjectAgendaItem`)
-            .where(`subjectAgendaItem.meetingMinutes = :meetingMinutesId`, { meetingMinutesId })
-            .leftJoin(`subjectAgendaItem.meetingMinutes`, `meetingMinutes`)
-            .getManyAndCount()
-    }
-
-    public async findOneSubjectAgendaItemById(id: string): Promise<SubjectAgendaItemEntity | null> {
-        return (await this.execRepository).findOne({
-            where: { id }
-        })
-    }
-
-    public async createSubjectAgendaItem(body: SubjectAgendaItemDTO): Promise<SubjectAgendaItemEntity> {
-        return (await this.execRepository).save(body)
-    }
-
-    public async updateSubjectAgendaItemById(id: string, infoUpdate: SubjectAgendaItemDTO): Promise<UpdateResult> {
-        return (await this.execRepository).update(id, { ...infoUpdate, updatedAt: new Date() })
-    }
-
-    public async deleteSubjectAgendaItemById(id: string): Promise<DeleteResult> {
-        return (await this.execRepository).delete(id)
+            .createQueryBuilder()
+            .where(`meetingMinutes IS NULL`)
+            .delete()
+            .execute()
     }
 }

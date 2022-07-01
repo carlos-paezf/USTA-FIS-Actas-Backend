@@ -1,3 +1,8 @@
+export interface ModulePermission {
+    moduleId: string,
+    permissionId: string
+}
+
 export interface TokenPayload {
     id: string,
     email: string,
@@ -6,5 +11,6 @@ export interface TokenPayload {
         id: string,
         roleName: string,
         deletedAt: Date | null
-    }
+    },
+    modulesPermissions: ModulePermission[]
 }

@@ -35,16 +35,16 @@ export class AttachedFilesService extends BaseService<AttachedFilesEntity> {
         return (await this.execRepository).findBy({ id: In(arrayIds) })
     }
 
-    public async searchAttachedFiles(filename: string, author: string): Promise<[AttachedFilesEntity[], number]> {
+    public async searchAttachedFiles(publicFilename: string, mimetype: string): Promise<[AttachedFilesEntity[], number]> {
         return (await this.execRepository)
             .createQueryBuilder(`attachedFiles`)
-            .where(`MATCH(attachedFiles.publicFilename) AGAINST ('${filename}' IN BOOLEAN MODE)`)
-            .where(`MATCH(attachedFiles.author) AGAINST ('${author}' IN BOOLEAN MODE)`)
+            .where(`MATCH(attachedFiles.publicFilename) AGAINST ('${publicFilename}' IN BOOLEAN MODE)`)
+            .orWhere(`MATCH(attachedFiles.mimetype) AGAINST ('${mimetype}' IN BOOLEAN MODE)`)
             .withDeleted()
             .getManyAndCount()
     }
 
-    public async findOneAttachedFileById(id: string, deleted: boolean): Promise<AttachedFilesEntity | null> {
+    public async findOneAttachedFileById(id: string, deleted = false): Promise<AttachedFilesEntity | null> {
         return (await this.execRepository).findOne({
             where: { id },
             withDeleted: (deleted) ? true : false

@@ -3,16 +3,18 @@ import { compare } from "bcrypt";
 
 import { ConfigServer } from "../../config";
 import { UserEntity } from "../../models";
-import { UserService } from '../../services';
-import { TokenPayload } from "../types/auth.interface";
+import { RoleModulePermissionService, UserService } from '../../services';
+import { ModulePermission, TokenPayload } from "../types/auth.interface";
 
 
 export class AuthService extends ConfigServer {
+    private _roleModulePermissionService: RoleModulePermissionService
     constructor(
         private readonly _userService: UserService = new UserService(),
         private readonly _jwtInstance = jwt
     ) {
         super()
+        this._roleModulePermissionService = new RoleModulePermissionService()
     }
 
     /**
@@ -63,8 +65,17 @@ export class AuthService extends ConfigServer {
     public async generateJWT(userId: string): Promise<{ accessToken: string, user: UserEntity } | null> {
         const user = await this._userService.findOneUserById(userId)
 
+
         if (!user) return null
         else user.password = 'Not Permission'
+
+        const modulesPermissionByRole = await this._roleModulePermissionService.findModulesPermissionsByRole(user.role.id)
+
+        const modulesPermissions: ModulePermission[] = []
+
+        for (const modulePermission of modulesPermissionByRole) {
+            modulesPermissions.push({ moduleId: modulePermission.module.id, permissionId: modulePermission.permission.id })
+        }
 
         const payload: TokenPayload = {
             id: user.id,
@@ -74,7 +85,8 @@ export class AuthService extends ConfigServer {
                 id: user.role.id,
                 roleName: user.role.roleName,
                 deletedAt: user.role.deletedAt
-            }
+            },
+            modulesPermissions: modulesPermissions
         }
         /*eslint-disable */
         return {

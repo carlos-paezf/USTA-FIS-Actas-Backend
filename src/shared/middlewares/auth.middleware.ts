@@ -3,23 +3,25 @@ import { NextFunction, Request, Response } from 'express';
 
 import { HttpResponse } from "../response/http.response";
 import { UserEntity } from '../../models';
-import { RoleModulePermissionService, RoleService, UserService } from '../../services';
+import { RoleService, UserService } from '../../services';
 import { RolesID } from '../../helpers/enums.helper';
 import { UserDTO } from '../../dtos';
 import { validate } from 'class-validator';
 import { red } from 'colors';
 import { AuthService } from '../../auth/services/auth.service';
-import { TokenPayload } from '../../auth/types/auth.interface';
-
-
-const _authService: AuthService = new AuthService()
-const _roleService: RoleService = new RoleService()
-const _roleModulePermissionService: RoleModulePermissionService = new RoleModulePermissionService()
-const _userService: UserService = new UserService()
+import { ModulePermission, TokenPayload } from '../../auth/types/auth.interface';
 
 
 export class AuthMiddleware {
-    constructor(protected readonly httpResponse: HttpResponse = new HttpResponse()) { }
+    private _authService: AuthService
+    private _roleService: RoleService
+    private _userService: UserService
+
+    constructor(protected readonly httpResponse: HttpResponse = new HttpResponse()) {
+        this._authService = new AuthService()
+        this._roleService = new RoleService()
+        this._userService = new UserService()
+    }
 
     /**
      * If the role is not enabled, return a precondition failed response, otherwise, call the next function
@@ -32,7 +34,7 @@ export class AuthMiddleware {
     public validateRoleIsEnabled = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { role } = req.body
-            const roleEnabled = await _roleService.roleIsEnabled(role)
+            const roleEnabled = await this._roleService.roleIsEnabled(role)
 
             return (!roleEnabled)
                 ? this.httpResponse.PreconditionFailed(res, `Role with id ${role} is disabled or has been removed`)
@@ -62,15 +64,26 @@ export class AuthMiddleware {
     public checkRoleModulePermission = (moduleId: string, permissionId: string) =>
         async (req: Request, res: Response, next: NextFunction) => {
             try {
-                const user = req.user as UserEntity
+                const user = req.user as TokenPayload
 
                 if (user.role.deletedAt !== null) {
                     return this.httpResponse.Unauthorized(res, `You do not have permission to access`)
                 }
 
-                const userQuery = await _roleModulePermissionService.validateRoleModulePermissionForJWT(user.role.id, moduleId, permissionId)
-
+                /* const userQuery = await _roleModulePermissionService.validateRoleModulePermissionForJWT(user.role.id, moduleId, permissionId)
                 if (!userQuery) {
+                    return this.httpResponse.Unauthorized(res, `You do not have permission to access`)
+                } */
+
+                const userQuery: ModulePermission[] = []
+
+                for (const modPer of user.modulesPermissions) {
+                    if (modPer.moduleId === moduleId && modPer.permissionId === permissionId) {
+                        userQuery.push(modPer)
+                    }
+                }
+
+                if (!userQuery || !userQuery.length) {
                     return this.httpResponse.Unauthorized(res, `You do not have permission to access`)
                 }
 
@@ -114,7 +127,7 @@ export class AuthMiddleware {
     public usernameAndEmailValidator = async (req: Request, res: Response, next: NextFunction) => {
         const { username, email } = req.body
         if (username) {
-            const userByUsername = await _userService.findUserByUsername(username.toUpperCase())
+            const userByUsername = await this._userService.findUserByUsername(username.toUpperCase())
 
             if (userByUsername) {
                 return this.httpResponse.BadRequest(res, `The username '${username}' is already being used`)
@@ -122,7 +135,7 @@ export class AuthMiddleware {
         }
 
         if (email) {
-            const userByEmail = await _userService.findUserByEmail(email.toUpperCase())
+            const userByEmail = await this._userService.findUserByEmail(email.toUpperCase())
 
             if (userByEmail) {
                 return this.httpResponse.BadRequest(res, `The email '${email}' is already being used`)
@@ -174,7 +187,7 @@ export class AuthMiddleware {
                 }
                 if (!jwt) return this.httpResponse.Unauthorized(res, `Token Not Found`)
 
-                const payload = await _authService.verifyJWT(jwt) as TokenPayload
+                const payload = await this._authService.verifyJWT(jwt) as TokenPayload
 
                 req.user = payload
                 next()

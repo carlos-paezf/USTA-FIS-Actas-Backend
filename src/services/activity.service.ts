@@ -1,49 +1,59 @@
-import { DeleteResult, UpdateResult } from "typeorm";
+import { red } from "colors";
+
 import { BaseService } from "../config";
-import { ActivityDTO } from "../dtos";
+import { CustomError } from "../helpers/custom-error.helper";
 import { ActivityEntity } from "../models";
+import { ObservationService } from "./observation.service";
 
 
 export class ActivityService extends BaseService<ActivityEntity> {
+    private _observationService: ObservationService
+
     constructor() {
         super(ActivityEntity)
+        this._observationService = new ObservationService()
     }
 
-    public async findAllActivitiesByMeetingMinutesId(meetingMinutesId: string): Promise<[ActivityEntity[], number]> {
+    // eslint-disable-next-line
+    public async removeRelationship(activity: ActivityEntity, columnRelation: string): Promise<void> {
+        try {
+            const relationship = (await this.execRepository)
+                .createQueryBuilder()
+                .relation(ActivityEntity, columnRelation)
+                .of(activity)
+                .loadMany();
+
+            (await this.execRepository)
+                .createQueryBuilder()
+                .relation(ActivityEntity, columnRelation)
+                .of(activity)
+                .remove(await relationship);
+            // eslint-disable-next-line
+        } catch (error: any) {
+            console.log(red(`Error in MeetingMinutesService:addAndRemoveRelationship: `), error)
+            throw new CustomError(`RemoveRelationship`, error.message, `RemoveRelationship`)
+        }
+    }
+
+    public async destroyNullActivities() {
+        const activitiesNull = await (
+            (await this.execRepository)
+                .createQueryBuilder(`activity`)
+                .where(`activity.meetingMinutes IS NULL`)
+                .getMany()
+        )
+
+        for (const activity of activitiesNull) {
+            await this.removeRelationship(activity, `responsibleUsers`)
+            await this.removeRelationship(activity, `observations`)
+        }
+
+        await this._observationService.destroyNullObservations()
+
         return (await this.execRepository)
-            .createQueryBuilder('activity')
-            .where(`activity.meetingMinutes = :meetingMinutesId`, { meetingMinutesId })
-            .leftJoin(`activity.meetingMinutes`, `meetingMinutes`, `meetingMinutes.id = :meetingMinutesId`, { meetingMinutesId })
-            .leftJoin(`activity.responsibleUser`, `user`)
-            .leftJoin(`activity.observations`, `observations`)
-            .getManyAndCount()
-    }
-
-    public async findUnfulfilledActivitiesFromPreviousMinutes(currentMeetingId: string): Promise<[ActivityEntity[], number]> {
-        return (await this.execRepository)
-            .createQueryBuilder(`activity`)
-            .where(`activity.meetingMinutes NOT IN (${currentMeetingId})`)
-            .leftJoin(`activity.meetingMinutes`, `meetingMinutes`)
-            .getManyAndCount()
-    }
-
-    public async createActivity(body: ActivityDTO): Promise<ActivityEntity> {
-        return (await this.execRepository).save(body)
-    }
-
-    public async updateActivityById(id: string, infoUpdate: ActivityDTO): Promise<UpdateResult> {
-        return (await this.execRepository).update(id, { ...infoUpdate, updatedAt: new Date() })
-    }
-
-    public async softDeleteActivityById(id: string): Promise<DeleteResult> {
-        return (await this.execRepository).softDelete(id)
-    }
-
-    public async restoreActivityById(id: string): Promise<UpdateResult> {
-        return (await this.execRepository).restore(id)
-    }
-
-    public async destroyActivityById(id: string): Promise<DeleteResult> {
-        return (await this.execRepository).delete(id)
+            .createQueryBuilder()
+            .where(`meetingMinutes IS NULL`)
+            .delete()
+            .execute()
     }
 }
