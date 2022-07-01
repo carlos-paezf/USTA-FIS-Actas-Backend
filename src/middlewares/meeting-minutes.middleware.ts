@@ -28,20 +28,32 @@ export class MeetingMinutesMiddleware extends SharedMiddleware<MeetingMinutesSer
 
     public idDisabledValidator = async (req: Request, res: Response, next: NextFunction, idDisabled: string) => {
         try {
+            const meetingMinutesExists = await this._service.findOneMeetingMinutesById(idDisabled)
+
+            if (!meetingMinutesExists) return this.httpResponse.NotFound(res, `There are no results for the id '${idDisabled}'`)
+
             const meetingMinutesEnable = await this._service.meetingMinutesIsEnabled(idDisabled)
 
-            return !meetingMinutesEnable ? this.httpResponse.PreconditionFailed(res, `The user with the id ${idDisabled} is already disabled`) : next()
+            return !meetingMinutesEnable
+                ? this.httpResponse.PreconditionFailed(res, `The user with the id ${idDisabled} is already disabled`)
+                : next()
         } catch (error) {
             console.log(red(`Error in MeetingMinutesMiddleware:idDisabledValidator: `), error)
             return this.httpResponse.InternalServerError(res, error)
         }
     }
 
-    public idEnabledValidator = async (req: Request, res: Response, next: NextFunction, idEnabled: string) => {
+    public idRestoreValidator = async (req: Request, res: Response, next: NextFunction, idRestore: string) => {
         try {
-            const meetingMinutesEnable = await this._service.meetingMinutesIsEnabled(idEnabled)
+            const meetingMinutesExists = await this._service.findOneMeetingMinutesById(idRestore)
 
-            return meetingMinutesEnable ? this.httpResponse.PreconditionFailed(res, `The user with the id ${idEnabled} is already disabled`) : next()
+            if (!meetingMinutesExists) return this.httpResponse.NotFound(res, `There are no results for the id '${idRestore}'`)
+
+            const meetingMinutesEnable = await this._service.meetingMinutesIsEnabled(idRestore)
+
+            return meetingMinutesEnable
+                ? this.httpResponse.PreconditionFailed(res, `The user with the id ${idRestore} is already disabled`)
+                : next()
         } catch (error) {
             console.log(red(`Error in MeetingMinutesMiddleware:idEnabledValidator: `), error)
             return this.httpResponse.InternalServerError(res, error)

@@ -25,7 +25,7 @@ export class AttachedFilesService extends BaseService<AttachedFilesEntity> {
         return (await this.execRepository)
             .createQueryBuilder(`attachedFiles`)
             .skip(from).take(limit)
-            .orderBy(`attachedFiles`, (order === 'ASC') ? 'ASC' : 'DESC')
+            .orderBy(`attachedFiles.publicFilename`, (order === 'ASC') ? 'ASC' : 'DESC')
             .where(`attachedFiles.deletedAt IS NOT NULL`)
             .withDeleted()
             .getManyAndCount()
@@ -51,9 +51,18 @@ export class AttachedFilesService extends BaseService<AttachedFilesEntity> {
         })
     }
 
+    public async findInternalNameById(id: string): Promise<AttachedFilesEntity | null> {
+        return (await this.execRepository).findOne({
+            where: { id },
+            withDeleted: true,
+            select: { internalFilename: true, mimetype: true }
+        })
+    }
+
     public async uploadAttachedFile(body: AttachedFilesDTO): Promise<AttachedFilesEntity> {
         const newFile = (await this.execRepository).create(body)
-        const fileLocation = `${this.PUBLIC_URL}:${this.PORT}/${newFile.fileLocation}`
+        newFile.id = newFile.internalFilename.split('.')[0]
+        const fileLocation = `${this.PUBLIC_URL}:${this.PORT}/api/v1/attached-files/download/${newFile.id}`
         return (await this.execRepository).save({ ...newFile, fileLocation })
     }
 
@@ -67,5 +76,12 @@ export class AttachedFilesService extends BaseService<AttachedFilesEntity> {
 
     public async destroyAttachedFileById(id: string): Promise<DeleteResult> {
         return (await this.execRepository).delete(id)
+    }
+
+    public async attachedFileIsEnabled(id: string): Promise<AttachedFilesEntity | null> {
+        return (await this.execRepository).findOne({
+            where: { id, deletedAt: undefined },
+            select: { id: true }
+        })
     }
 }

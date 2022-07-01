@@ -61,10 +61,10 @@ export class MeetingMinutesRouter extends BaseRouter<MeetingMinutesController, M
             this.controller.softDeleteMeetingMinutesById
         )
 
-        this.router.param('idEnabled', this.middleware.idEnabledValidator)
+        this.router.param('idRestore', this.middleware.idRestoreValidator)
 
         this.router.patch(
-            `/meeting-minutes/restore/:idEnabled`,
+            `/meeting-minutes/restore/:idRestore`,
             [
                 this.middleware.validateJWT,
                 this.middleware.checkRoleModulePermission(ModulesID.MINUTES_OF_MEETING, PermissionsID.RESTORE)

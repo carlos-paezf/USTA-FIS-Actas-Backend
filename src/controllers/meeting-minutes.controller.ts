@@ -223,9 +223,9 @@ export class MeetingMinutesController extends BaseController<MeetingMinutesServi
 
     public restoreMeetingMinutesById = async (req: Request, res: Response) => {
         try {
-            const { idEnabled } = req.params
+            const { idRestore } = req.params
 
-            const data: UpdateResult = await this._service.restoreMeetingMinutesById(idEnabled)
+            const data: UpdateResult = await this._service.restoreMeetingMinutesById(idRestore)
 
             if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
 

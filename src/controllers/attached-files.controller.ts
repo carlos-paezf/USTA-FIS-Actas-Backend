@@ -3,8 +3,11 @@ import { Request, Response } from "express";
 import { TokenPayload } from "../auth/types/auth.interface";
 
 import { BaseController } from "../config";
+import { removeAttachedFile } from "../helpers/remove-attached-file.helper";
 import { AttachedFilesEntity } from "../models";
 import { AttachedFilesService } from "../services";
+import { DeleteResult, UpdateResult } from 'typeorm';
+import { downloadAttachedFile } from "../helpers/download-attached-file.helper";
 
 
 export class AttachedFilesController extends BaseController<AttachedFilesService> {
@@ -120,6 +123,79 @@ export class AttachedFilesController extends BaseController<AttachedFilesService
             return this._httpResponse.Created(res, { data })
         } catch (error) {
             console.log(red(`Error in AttachedFilesController:uploadAttachedFiles: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public downloadAttachedFile = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+
+            const file = await this._service.findInternalNameById(id)
+
+            if (!file) return this._httpResponse.BadRequest(res, `There are no results for the id ${id}`)
+
+            const { internalFilename, mimetype } = file
+
+            await downloadAttachedFile(internalFilename, mimetype, res)
+        } catch (error) {
+            console.log(red(`Error in AttachedFilesController:downloadAttachedFile: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public softDeleteAttachedFileById = async (req: Request, res: Response) => {
+        try {
+            const { idDisabled } = req.params
+
+            const data: DeleteResult = await this._service.softDeleteAttachedFileById(idDisabled)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in AttachedFilesController:softDeleteAttachedFileById: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public restoreAttachedFileById = async (req: Request, res: Response) => {
+        try {
+            const { idRestore } = req.params
+
+            const data: UpdateResult = await this._service.restoreAttachedFileById(idRestore)
+
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            return this._httpResponse.Ok(res, data)
+        } catch (error) {
+            console.log(red(`Error in AttachedFilesController:restoreAttachedFileById: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    public destroyAttachedFileById = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+            const file = await this._service.findInternalNameById(id)
+
+            if (!file) return this._httpResponse.BadRequest(res, `There are no results for the id ${id}`)
+
+            const internalFilename = file.internalFilename
+
+            const data: DeleteResult = await this._service.destroyAttachedFileById(id)
+            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+
+            await removeAttachedFile(internalFilename)
+
+            return this._httpResponse.Ok(res, data)
+
+            // eslint-disable-next-line
+        } catch (error: any) {
+            console.log(red(`Error in AttachedFilesController:deleteAttachedFileById: `), error)
+            if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+                return this._httpResponse.Forbidden(res, `Cannot delete a file that maintains relationships with other records in the database`)
+            }
             return this._httpResponse.InternalServerError(res, error)
         }
     }
