@@ -7,7 +7,7 @@ import { ObservationService } from "./observation.service";
 
 
 export class ActivityService extends BaseService<ActivityEntity> {
-    private _observationService: ObservationService
+    private readonly _observationService: ObservationService
 
     constructor() {
         super(ActivityEntity)

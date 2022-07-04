@@ -13,9 +13,9 @@ import { ModulePermission, TokenPayload } from '../../auth/types/auth.interface'
 
 
 export class AuthMiddleware {
-    private _authService: AuthService
-    private _roleService: RoleService
-    private _userService: UserService
+    private readonly _authService: AuthService
+    private readonly _roleService: RoleService
+    private readonly _userService: UserService
 
     constructor(protected readonly httpResponse: HttpResponse = new HttpResponse()) {
         this._authService = new AuthService()

@@ -1,2 +1,2 @@
-::1 - - [01/Jul/2022:19:32:44 +0000] "POST /auth//login HTTP/1.1" 200 4421 - application/json; charset=utf-8
-::1 - - [01/Jul/2022:19:33:16 +0000] "POST /auth/login HTTP/1.1" 200 4421 - application/json; charset=utf-8
+::1 - - [02/Jul/2022:22:55:25 +0000] "POST /auth/register HTTP/1.1" 412 370 - application/json; charset=utf-8
+::1 - - [02/Jul/2022:22:56:04 +0000] "POST /auth/register HTTP/1.1" 201 1029 - application/json; charset=utf-8

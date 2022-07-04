@@ -10,8 +10,8 @@ import { SubjectAgendaItemService } from './subject-agenda-item.service';
 
 
 export class MeetingMinutesService extends BaseService<MeetingMinutesEntity> {
-    private _activityService: ActivityService
-    private _subjectAgendaService: SubjectAgendaItemService
+    private readonly _activityService: ActivityService
+    private readonly _subjectAgendaService: SubjectAgendaItemService
 
     constructor() {
         super(MeetingMinutesEntity)

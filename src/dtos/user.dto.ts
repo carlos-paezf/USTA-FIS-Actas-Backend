@@ -32,7 +32,7 @@ export class UserDTO extends BaseDTO {
     lastName!: string
 
     @IsNotEmpty()
-    @MinLength(4)
+    @MinLength(6)
     @MaxLength(15)
     username!: string
 
@@ -41,6 +41,7 @@ export class UserDTO extends BaseDTO {
     email!: string
 
     @IsNotEmpty()
+    @MinLength(6)
     password!: string
 
     /*  @IsOptional()

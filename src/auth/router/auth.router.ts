@@ -28,5 +28,10 @@ export class AuthRouter extends BaseRouter<AuthController, AuthMiddleware> {
             ],
             this.controller.renewToken
         )
+
+        this.router.get(
+            '/validate',
+            this.controller.validateExistsEmailOrUsername
+        )
     }
 }

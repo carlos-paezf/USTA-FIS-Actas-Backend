@@ -8,8 +8,8 @@ import { DeleteResult, UpdateResult } from 'typeorm';
 
 
 export class MeetingMinutesController extends BaseController<MeetingMinutesService> {
-    private _userService: UserService
-    private _attachedFiles: AttachedFilesService
+    private readonly _userService: UserService
+    private readonly _attachedFiles: AttachedFilesService
 
     constructor() {
         super(MeetingMinutesService)

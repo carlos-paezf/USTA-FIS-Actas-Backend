@@ -10,7 +10,7 @@ const _permissionService: PermissionService = new PermissionService()
 
 
 export class SharedMiddleware<T> extends AuthMiddleware {
-    protected _service: T
+    protected readonly _service: T
 
     constructor(TService: { new(): T }) {
         super()

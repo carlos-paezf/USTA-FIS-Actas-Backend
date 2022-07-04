@@ -2,15 +2,13 @@ import { red } from "colors";
 import { Request, Response } from "express";
 
 import { UserEntity } from "../../models";
-import { UserService } from "../../services";
 import { HttpResponse } from "../../shared/response/http.response";
 import { AuthService } from "../services/auth.service";
 import { RolesID } from "../../helpers/enums.helper";
 
 
-const _userService: UserService = new UserService()
-
 export class AuthController extends AuthService {
+
     constructor(private readonly _httpResponse: HttpResponse = new HttpResponse()) {
         super()
     }
@@ -24,9 +22,17 @@ export class AuthController extends AuthService {
      */
     public login = async (req: Request, res: Response) => {
         try {
-            const emailOrUsername = req.body.email ?? req.body.username
+            const { emailOrUsername, password } = req.body
 
-            const user = await this.validateUser(emailOrUsername, req.body.password)
+            if (!emailOrUsername || emailOrUsername.trim() === '') {
+                return this._httpResponse.BadRequest(res, `Unable to send empty email field`)
+            }
+
+            if (!password || password.trim === '') {
+                return this._httpResponse.BadRequest(res, `Unable to send empty password field`)
+            }
+
+            const user = await this.validateUser(emailOrUsername, password)
             if (!user) return this._httpResponse.BadRequest(res, `Invalid email/username or password`)
 
             const encode = await this.generateJWT(user.id)
@@ -51,7 +57,7 @@ export class AuthController extends AuthService {
             const data = req.body
             data.role = RolesID.GUEST
 
-            const user = await _userService.createUser({ ...data })
+            const user = await this._userService.createUser({ ...data })
 
             const encode = await this.generateJWT(user.id)
             if (!encode) return this._httpResponse.Unauthorized(res, `You do not have permission to access`)
@@ -61,6 +67,36 @@ export class AuthController extends AuthService {
             return this._httpResponse.Created(res, encode)
         } catch (error) {
             console.log(red(`Error in AuthController:register: `), error)
+            return this._httpResponse.InternalServerError(res, error)
+        }
+    }
+
+    /**
+     * It checks if the email or username is already registered in the database
+     * @param {Request} req - Request -&gt; The request object
+     * @param {Response} res - Response -&gt; this is the response object that will be returned to the
+     * client
+     * @returns The return is a function that is being called with the parameters res and error.
+     */
+    public validateExistsEmailOrUsername = async (req: Request, res: Response) => {
+        try {
+            const { email = '', username = '' } = req.query
+
+            if (String(email).trim() !== '') {
+                const data = await this._userService.findUserByEmail(String(email))
+
+                if (data) return this._httpResponse.BadRequest(res, `Email '${email}' is already registered`)
+            }
+
+            if (String(username).trim() !== '') {
+                const data = await this._userService.findUserByUsername(String(username))
+
+                if (data) return this._httpResponse.BadRequest(res, `Username '${username}' is already registered`)
+            }
+
+            return this._httpResponse.Continue(res)
+        } catch (error) {
+            console.log(red(`Error in AuthController:validateExistsEmailOrUsername: `), error)
             return this._httpResponse.InternalServerError(res, error)
         }
     }

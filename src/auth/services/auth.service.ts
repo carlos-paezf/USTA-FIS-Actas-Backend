@@ -8,9 +8,10 @@ import { ModulePermission, TokenPayload } from "../types/auth.interface";
 
 
 export class AuthService extends ConfigServer {
-    private _roleModulePermissionService: RoleModulePermissionService
+    private readonly _roleModulePermissionService: RoleModulePermissionService
+
     constructor(
-        private readonly _userService: UserService = new UserService(),
+        protected readonly _userService: UserService = new UserService(),
         private readonly _jwtInstance = jwt
     ) {
         super()
