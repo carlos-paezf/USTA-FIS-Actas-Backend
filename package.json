@@ -12,6 +12,7 @@
         "start": "tsc && node dist/server.js",
         "start:dev": "tsc && concurrently \"tsc -w\" \"nodemon dist/server.js\"",
         "start:prod": "SET NODE_ENV=production && npm start",
+        "logs": "cat access.log",
         "typeorm": "typeorm-ts-node-esm -d ./src/config/data.config.ts",
         "m:gen": "npm run typeorm migration:generate",
         "m:run": "npm run typeorm migration:run",

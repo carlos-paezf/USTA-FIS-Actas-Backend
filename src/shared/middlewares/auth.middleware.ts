@@ -67,7 +67,7 @@ export class AuthMiddleware {
                 const user = req.user as TokenPayload
 
                 if (user.role.deletedAt !== null) {
-                    return this.httpResponse.Unauthorized(res, `You do not have permission to access`)
+                    return this.httpResponse.Forbidden(res, `You do not have permission to access`)
                 }
 
                 /* const userQuery = await _roleModulePermissionService.validateRoleModulePermissionForJWT(user.role.id, moduleId, permissionId)
@@ -84,7 +84,7 @@ export class AuthMiddleware {
                 }
 
                 if (!userQuery || !userQuery.length) {
-                    return this.httpResponse.Unauthorized(res, `You do not have permission to access`)
+                    return this.httpResponse.Forbidden(res, `You do not have permission to access`)
                 }
 
                 next()

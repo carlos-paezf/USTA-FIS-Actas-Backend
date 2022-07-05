@@ -66,7 +66,6 @@ export class AuthService extends ConfigServer {
     public async generateJWT(userId: string): Promise<{ accessToken: string, user: UserEntity } | null> {
         const user = await this._userService.findOneUserById(userId)
 
-
         if (!user) return null
         else user.password = 'Not Permission'
 

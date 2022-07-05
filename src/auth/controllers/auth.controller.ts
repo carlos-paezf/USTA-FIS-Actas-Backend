@@ -33,7 +33,7 @@ export class AuthController extends AuthService {
             }
 
             const user = await this.validateUser(emailOrUsername, password)
-            if (!user) return this._httpResponse.BadRequest(res, `Invalid email/username or password`)
+            if (!user) return this._httpResponse.Unauthorized(res, `Invalid email/username or password`)
 
             const encode = await this.generateJWT(user.id)
             if (!encode) return this._httpResponse.Unauthorized(res, `You do not have permission to access`)
@@ -85,16 +85,16 @@ export class AuthController extends AuthService {
             if (String(email).trim() !== '') {
                 const data = await this._userService.findUserByEmail(String(email))
 
-                if (data) return this._httpResponse.BadRequest(res, `Email '${email}' is already registered`)
+                if (data) return this._httpResponse.Ok(res, { isUnique: false })
             }
 
             if (String(username).trim() !== '') {
                 const data = await this._userService.findUserByUsername(String(username))
 
-                if (data) return this._httpResponse.BadRequest(res, `Username '${username}' is already registered`)
+                if (data) return this._httpResponse.Ok(res, { isUnique: false })
             }
 
-            return this._httpResponse.Continue(res)
+            return this._httpResponse.Ok(res, { isUnique: true })
         } catch (error) {
             console.log(red(`Error in AuthController:validateExistsEmailOrUsername: `), error)
             return this._httpResponse.InternalServerError(res, error)

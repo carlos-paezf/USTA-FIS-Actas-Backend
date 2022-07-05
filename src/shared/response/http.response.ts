@@ -7,31 +7,19 @@ import { Response } from "express";
  * @author Carlos Páez
  */
 export enum HttpStatus {
-    CONTINUE = 100,
     OK = 200,
     CREATED = 201,
     BAD_REQUEST = 400,
     UNAUTHORIZED = 401,
     FORBIDDEN = 403,
     NOT_FOUND = 404,
+    CONFLICT = 409,
     PRECONDITION_FAILED = 412,
     INTERNAL_SERVER_ERROR = 500
 }
 
 
 export class HttpResponse {
-    /**
-     * It returns a response with a status code of 100.
-     * @param {Response} res - Response - The response object that is passed to the function.
-     * @returns A response object with a status of 100 and a status message of Continue.
-     */
-    public Continue(res: Response): Response<unknown> {
-        return res.status(HttpStatus.CONTINUE).json({
-            status: HttpStatus.CONTINUE,
-            statusMsg: 'Continue'
-        })
-    }
-
     /**
      * It returns a response object with a status code of 200 and a message of 'Success'
      * @param {Response} res - Response - This is the response object that is passed to the controller
@@ -127,6 +115,19 @@ export class HttpResponse {
         return res.status(HttpStatus.NOT_FOUND).json({
             status: HttpStatus.NOT_FOUND,
             statusMsg: 'Not Found',
+            error: data
+        })
+    }
+
+    /**
+     * It returns a response with a status code of 409.
+     * @param {Response} res - Response - The response object that is passed to the function.
+     * @returns A response object with a status of 409 and a status message of Conflict.
+     */
+    public Conflict(res: Response, data?: unknown): Response<unknown> {
+        return res.status(HttpStatus.CONFLICT).json({
+            status: HttpStatus.CONFLICT,
+            statusMsg: 'Conflict',
             error: data
         })
     }
