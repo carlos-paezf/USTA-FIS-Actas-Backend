@@ -117,7 +117,7 @@ export class AuthController extends AuthService {
 
             return this._httpResponse.Ok(res, encode)
         } catch (error) {
-            console.log(red(`Error un AuthController:renewToken`), error)
+            console.log(red(`Error in AuthController:renewToken: `), error)
             return this._httpResponse.InternalServerError(res, error)
         }
     }
