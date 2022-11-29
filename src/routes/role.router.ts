@@ -1,22 +1,30 @@
-import { BaseRouter } from "../config";
-import { RoleController } from "../controllers";
-import { ModulesID, PermissionsID } from "../helpers/enums.helper";
-import { RoleMiddleware } from "../middlewares";
+import { BaseRouter } from "../config"
+import { RoleController } from "../controllers"
+import { ModulesID, PermissionsID } from "../helpers/enums.helper"
+import { RoleMiddleware } from "../middlewares"
 
 
 export class RoleRouter extends BaseRouter<RoleController, RoleMiddleware> {
-    constructor() {
-        super(RoleController, RoleMiddleware)
+    constructor () {
+        super( RoleController, RoleMiddleware )
     }
 
-    protected routes(): void {
-        this.router.param('id', this.middleware.idParamValidator)
+    protected routes (): void {
+        this.router.get(
+            '/roles/validate',
+            [
+                this.middleware.validateJWT
+            ],
+            this.controller.validateUniqueRoleName
+        )
+
+        this.router.param( 'id', this.middleware.idParamValidator )
 
         this.router.get(
             '/roles',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.ROLES, PermissionsID.READ)
+                this.middleware.checkRoleModulePermission( ModulesID.ROLES, PermissionsID.READ )
             ],
             this.controller.findRoles
         )
@@ -25,7 +33,7 @@ export class RoleRouter extends BaseRouter<RoleController, RoleMiddleware> {
             '/roles/:id',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.ROLES, PermissionsID.READ)
+                this.middleware.checkRoleModulePermission( ModulesID.ROLES, PermissionsID.READ )
             ],
             this.controller.findOneRoleById
         )
@@ -34,7 +42,7 @@ export class RoleRouter extends BaseRouter<RoleController, RoleMiddleware> {
             '/roles',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.ROLES, PermissionsID.CREATE),
+                this.middleware.checkRoleModulePermission( ModulesID.ROLES, PermissionsID.CREATE ),
                 this.middleware.roleNameValidator,
                 this.middleware.roleValidator
             ],
@@ -45,30 +53,30 @@ export class RoleRouter extends BaseRouter<RoleController, RoleMiddleware> {
             '/roles/:id',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.ROLES, PermissionsID.UPDATE),
-                this.middleware.roleNameValidator
+                this.middleware.checkRoleModulePermission( ModulesID.ROLES, PermissionsID.UPDATE ),
+                // this.middleware.roleNameValidator
             ],
             this.controller.updateRoleById
         )
 
-        this.router.param('idDisabled', this.middleware.idDisabledValidator)
+        this.router.param( 'idDisabled', this.middleware.idDisabledValidator )
 
         this.router.patch(
             '/roles/disabled/:idDisabled',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.ROLES, PermissionsID.SOFT_DELETE)
+                this.middleware.checkRoleModulePermission( ModulesID.ROLES, PermissionsID.SOFT_DELETE )
             ],
             this.controller.softDeleteRoleById
         )
 
-        this.router.param('idRestore', this.middleware.idRestoreValidator)
+        this.router.param( 'idRestore', this.middleware.idRestoreValidator )
 
         this.router.patch(
             '/roles/restore/:idRestore',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.ROLES, PermissionsID.RESTORE)
+                this.middleware.checkRoleModulePermission( ModulesID.ROLES, PermissionsID.RESTORE )
             ],
             this.controller.restoreRoleById
         )
@@ -77,7 +85,7 @@ export class RoleRouter extends BaseRouter<RoleController, RoleMiddleware> {
             '/roles/destroy/:idDestroy',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.ROLES, PermissionsID.HARD_DELETE)
+                this.middleware.checkRoleModulePermission( ModulesID.ROLES, PermissionsID.HARD_DELETE )
             ],
             this.controller.destroyRoleById
         )

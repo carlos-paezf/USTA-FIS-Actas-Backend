@@ -1,11 +1,9 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Init1656547560192 implements MigrationInterface {
-    name = 'Init1656547560192'
+export class Init1667192743331 implements MigrationInterface {
+    name = 'Init1667192743331'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP INDEX \`IDX_e10bfbd4b8f0bdc8f363ab5757\` ON \`modules\``);
-        await queryRunner.query(`DROP INDEX \`IDX_b990eff1fc3540798960d80e45\` ON \`permissions\``);
         await queryRunner.query(`DROP INDEX \`IDX_ac35f51a0f17e3e1fe12112603\` ON \`roles\``);
         await queryRunner.query(`CREATE TABLE \`attached_files\` (\`id\` varchar(36) NOT NULL, \`created_at\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` timestamp(6) NULL, \`internal_filename\` varchar(255) NOT NULL, \`public_filename\` varchar(255) NOT NULL, \`file_location\` varchar(255) NOT NULL, \`mimetype\` varchar(255) NOT NULL, \`size\` int NOT NULL, \`user_id\` varchar(36) NULL, FULLTEXT INDEX \`IDX_9c7a153d6cf68320f6a94d7a10\` (\`public_filename\`), FULLTEXT INDEX \`IDX_4c3c4d0e48622f7d87d997a2a4\` (\`mimetype\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`organization\` (\`id\` varchar(36) NOT NULL, \`created_at\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleted_at\` timestamp(6) NULL, \`organization_type\` enum ('ORGANIZATION', 'COMMITTEE', 'AREA', 'PROGRAM') NOT NULL DEFAULT 'COMMITTEE', \`organization_name\` varchar(255) NOT NULL, FULLTEXT INDEX \`IDX_84931e71beb141b1e131f80daa\` (\`organization_name\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -92,8 +90,6 @@ export class Init1656547560192 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX \`IDX_9c7a153d6cf68320f6a94d7a10\` ON \`attached_files\``);
         await queryRunner.query(`DROP TABLE \`attached_files\``);
         await queryRunner.query(`CREATE UNIQUE INDEX \`IDX_ac35f51a0f17e3e1fe12112603\` ON \`roles\` (\`role_name\`)`);
-        await queryRunner.query(`CREATE UNIQUE INDEX \`IDX_b990eff1fc3540798960d80e45\` ON \`permissions\` (\`permission_name\`)`);
-        await queryRunner.query(`CREATE UNIQUE INDEX \`IDX_e10bfbd4b8f0bdc8f363ab5757\` ON \`modules\` (\`module_name\`)`);
     }
 
 }

@@ -1,22 +1,22 @@
-import { BaseRouter } from "../config";
-import { UserController } from "../controllers";
-import { ModulesID, PermissionsID } from "../helpers/enums.helper";
-import { UserMiddleware } from "../middlewares";
+import { BaseRouter } from "../config"
+import { UserController } from "../controllers"
+import { ModulesID, PermissionsID } from "../helpers/enums.helper"
+import { UserMiddleware } from "../middlewares"
 
 
 export class UserRouter extends BaseRouter<UserController, UserMiddleware> {
-    constructor() {
-        super(UserController, UserMiddleware)
+    constructor () {
+        super( UserController, UserMiddleware )
     }
 
-    protected routes(): void {
-        this.router.param('id', this.middleware.idParamValidator)
+    protected routes (): void {
+        this.router.param( 'id', this.middleware.idParamValidator )
 
         this.router.get(
             '/users',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.USERS, PermissionsID.READ)
+                this.middleware.checkRoleModulePermission( ModulesID.USERS, PermissionsID.READ )
             ],
             this.controller.findUsers
         )
@@ -25,7 +25,7 @@ export class UserRouter extends BaseRouter<UserController, UserMiddleware> {
             '/users/:id',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.USERS, PermissionsID.READ)
+                this.middleware.checkRoleModulePermission( ModulesID.USERS, PermissionsID.READ )
             ],
             this.controller.findOneUserById
         )
@@ -42,7 +42,7 @@ export class UserRouter extends BaseRouter<UserController, UserMiddleware> {
             '/users',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.USERS, PermissionsID.CREATE),
+                this.middleware.checkRoleModulePermission( ModulesID.USERS, PermissionsID.CREATE ),
                 this.middleware.usernameAndEmailValidator,
                 this.middleware.validateRoleIsEnabled,
                 this.middleware.userValidator
@@ -54,8 +54,8 @@ export class UserRouter extends BaseRouter<UserController, UserMiddleware> {
             '/users/:id',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.USERS, PermissionsID.UPDATE),
-                this.middleware.validateRoleIsEnabled,
+                this.middleware.checkRoleModulePermission( ModulesID.USERS, PermissionsID.UPDATE ),
+                // this.middleware.validateRoleIsEnabled,
                 this.middleware.userValidator
             ],
             this.controller.updateUserById
@@ -103,30 +103,30 @@ export class UserRouter extends BaseRouter<UserController, UserMiddleware> {
             '/users/update-role/:id',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.USERS, PermissionsID.UPDATE),
+                this.middleware.checkRoleModulePermission( ModulesID.USERS, PermissionsID.UPDATE ),
                 this.middleware.updateRoleValidator
             ],
             this.controller.updateUserRoleById
         )
 
-        this.router.param('idDisabled', this.middleware.idDisabledValidator)
+        this.router.param( 'idDisabled', this.middleware.idDisabledValidator )
 
         this.router.patch(
             '/users/disabled/:idDisabled',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.USERS, PermissionsID.SOFT_DELETE)
+                this.middleware.checkRoleModulePermission( ModulesID.USERS, PermissionsID.SOFT_DELETE )
             ],
             this.controller.softDeleteUserById
         )
 
-        this.router.param('idRestore', this.middleware.idRestoreValidator)
+        this.router.param( 'idRestore', this.middleware.idRestoreValidator )
 
         this.router.patch(
             '/users/restore/:idRestore',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.USERS, PermissionsID.RESTORE)
+                this.middleware.checkRoleModulePermission( ModulesID.USERS, PermissionsID.RESTORE )
             ],
             this.controller.restoreUserById
         )
@@ -135,7 +135,7 @@ export class UserRouter extends BaseRouter<UserController, UserMiddleware> {
             '/users/destroy/:idDestroy',
             [
                 this.middleware.validateJWT,
-                this.middleware.checkRoleModulePermission(ModulesID.USERS, PermissionsID.HARD_DELETE)
+                this.middleware.checkRoleModulePermission( ModulesID.USERS, PermissionsID.HARD_DELETE )
             ],
             this.controller.destroyUserById
         )

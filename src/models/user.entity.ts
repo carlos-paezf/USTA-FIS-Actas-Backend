@@ -1,10 +1,10 @@
-import { Exclude } from "class-transformer";
-import { Column, Entity, Index, JoinColumn, ManyToMany, ManyToOne, OneToMany } from "typeorm";
-import { BaseEntity } from "../config";
-import { ActivityEntity } from "./activity.entity";
-import { MeetingMinutesEntity } from "./meeting-minutes.entity";
-import { RoleEntity } from "./role.entity";
-import { AttachedFilesEntity } from './attached-files.entity';
+import { Exclude } from "class-transformer"
+import { Column, Entity, Index, JoinColumn, ManyToMany, ManyToOne, OneToMany } from "typeorm"
+import { BaseEntity } from "../config"
+import { ActivityEntity } from "./activity.entity"
+import { MeetingMinutesEntity } from "./meeting-minutes.entity"
+import { RoleEntity } from "./role.entity"
+import { AttachedFilesEntity } from './attached-files.entity'
 
 
 /** 
@@ -14,51 +14,54 @@ import { AttachedFilesEntity } from './attached-files.entity';
  * 
  * @author Carlos Páez
  */
-@Entity({ name: `users` })
+@Entity( { name: `users` } )
 export class UserEntity extends BaseEntity {
-    @Index({ fulltext: true })
+    @Index( { fulltext: true } )
     @Column()
     name!: string
 
-    @Index({ fulltext: true })
+    @Index( { fulltext: true } )
     @Column()
     lastName!: string
 
-    @Column({ length: 15, nullable: false, unique: true })
+    @Column( { length: 15, nullable: false, unique: true } )
     username!: string
 
-    @Column({ nullable: false, unique: true })
+    @Column( { nullable: false, unique: true } )
     email!: string
 
     @Exclude()
-    @Column({ select: false, nullable: false })
+    @Column( { select: false, nullable: false } )
     password!: string
 
     @Column()
     position!: string
 
-    @ManyToOne(() => RoleEntity, (role) => role.users)
-    @JoinColumn({ name: 'role_id' })
+    @ManyToOne( () => RoleEntity, ( role ) => role.users )
+    @JoinColumn( { name: 'role_id' } )
     role!: RoleEntity
 
-    @OneToMany(() => MeetingMinutesEntity, (activity) => activity.createdBy)
+    @Column( { type: `longblob` } )
+    profileImage!: string
+
+    @OneToMany( () => MeetingMinutesEntity, ( activity ) => activity.createdBy )
     meetingMinutesCreated!: MeetingMinutesEntity
 
-    @OneToMany(() => MeetingMinutesEntity, (activity) => activity.reviewedBy)
+    @OneToMany( () => MeetingMinutesEntity, ( activity ) => activity.reviewedBy )
     meetingMinutesReviewed!: MeetingMinutesEntity
 
-    @OneToMany(() => AttachedFilesEntity, (files) => files.author)
+    @OneToMany( () => AttachedFilesEntity, ( files ) => files.author )
     attachedFiles!: AttachedFilesEntity[]
 
-    @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.summoned)
+    @ManyToMany( () => MeetingMinutesEntity, ( meetingMinutes ) => meetingMinutes.summoned )
     summonedToMeetingMinutes!: MeetingMinutesEntity[]
 
-    @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.absent)
+    @ManyToMany( () => MeetingMinutesEntity, ( meetingMinutes ) => meetingMinutes.absent )
     absentToMeetingMinutes!: MeetingMinutesEntity[]
 
-    @ManyToMany(() => MeetingMinutesEntity, (meetingMinutes) => meetingMinutes.guest)
+    @ManyToMany( () => MeetingMinutesEntity, ( meetingMinutes ) => meetingMinutes.guest )
     guestToMeetingMinutes!: MeetingMinutesEntity[]
 
-    @ManyToMany(() => ActivityEntity, (activity) => activity.responsibleUsers)
+    @ManyToMany( () => ActivityEntity, ( activity ) => activity.responsibleUsers )
     activities!: ActivityEntity[]
 }

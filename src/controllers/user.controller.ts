@@ -1,10 +1,10 @@
 import { Request, Response } from "express"
-import { DeleteResult, UpdateResult } from "typeorm";
-import { red } from 'colors';
+import { DeleteResult, UpdateResult } from "typeorm"
+import { red } from 'colors'
 
 import { UserService } from "../services"
-import { BaseController } from "../config";
-import { RolesID } from "../helpers/enums.helper";
+import { BaseController } from "../config"
+import { RolesID } from "../helpers/enums.helper"
 
 
 /**
@@ -14,8 +14,8 @@ import { RolesID } from "../helpers/enums.helper";
  * @author Carlos Páez
  */
 export class UserController extends BaseController<UserService> {
-    constructor() {
-        super(UserService)
+    constructor () {
+        super( UserService )
     }
 
     /**
@@ -25,26 +25,26 @@ export class UserController extends BaseController<UserService> {
      * @returns An object with the sent values of from, limit, all, order, the number of 
      * records returned by the query, the total number of records, and the array of users
      */
-    public findUsers = async (req: Request, res: Response): Promise<unknown> => {
+    public findUsers = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const { from = 0, limit = 10, all = false, order = 'ASC' } = req.query
 
-            const [data, totalCount] = await this._service.findUsers(
-                Number(from),
-                Number(limit),
-                Boolean(all),
-                String(order).toUpperCase()
+            const [ data, totalCount ] = await this._service.findUsers(
+                Number( from ),
+                Number( limit ),
+                Boolean( all ),
+                String( order ).toUpperCase()
             )
-            if (!data.length) return this._httpResponse.NotFound(res, `There are no results for the search`)
+            if ( !data.length ) return this._httpResponse.NotFound( res, `There are no results for the search` )
 
-            return this._httpResponse.Ok(res, {
+            return this._httpResponse.Ok( res, {
                 from, limit, all, order,
                 partialCount: data.length, totalCount,
                 data
-            })
-        } catch (error) {
-            console.log(red(`Error in UserController:findUsers: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            } )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:findUsers: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -54,21 +54,21 @@ export class UserController extends BaseController<UserService> {
      * @param {Response} res - Response =&gt; Express Response object
      * @returns The user record that matches the id
      */
-    public findOneUserById = async (req: Request, res: Response): Promise<unknown> => {
+    public findOneUserById = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const { id } = req.params
             const { deleted } = req.query
 
             const data = deleted
-                ? await this._service.findOneUserByIdIncludeDeleted(id)
-                : await this._service.findOneUserById(id)
+                ? await this._service.findOneUserByIdIncludeDeleted( id )
+                : await this._service.findOneUserById( id )
 
-            if (!data) return this._httpResponse.NotFound(res, `There are no results for the id '${id}'`)
+            if ( !data ) return this._httpResponse.NotFound( res, `There are no results for the id '${ id }'` )
 
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:findOneUserById: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, data )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:findOneUserById: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -78,17 +78,17 @@ export class UserController extends BaseController<UserService> {
      * @param {Response} res - Response =&gt; Express Response object
      * @returns An object with the embedded information
      */
-    public createUser = async (req: Request, res: Response): Promise<unknown> => {
+    public createUser = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const user = req.body
             user.role = user.role ?? RolesID.GUEST
 
-            const data = await this._service.createUser({ ...user })
+            const data = await this._service.createUser( { ...user } )
 
-            return this._httpResponse.Created(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:createUser: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Created( res, data )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:createUser: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -98,18 +98,18 @@ export class UserController extends BaseController<UserService> {
      * @param {Response} res - Response =&gt; Express Response object
      * @returns An object with the number of affected rows
      */
-    public updateUserById = async (req: Request, res: Response): Promise<unknown> => {
+    public updateUserById = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const { id } = req.params
             const { email, username, password, role, ...infoUpdate } = req.body
-            const data: UpdateResult = await this._service.updateUserById(id, { ...infoUpdate })
+            const data: UpdateResult = await this._service.updateUserById( id, { ...infoUpdate } )
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+            if ( !data.affected ) return this._httpResponse.BadRequest( res, `Changes have not been applied` )
 
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:updateUserById: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, data )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:updateUserById: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -119,18 +119,18 @@ export class UserController extends BaseController<UserService> {
      * @param {Response} res - Response =&gt; Express Response object
      * @returns An object with the number of affected rows
      */
-    public updateUsernameById = async (req: Request, res: Response): Promise<unknown> => {
+    public updateUsernameById = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const { id } = req.params
             const { username } = req.body
-            const data: UpdateResult = await this._service.updateUsernameById(id, username)
+            const data: UpdateResult = await this._service.updateUsernameById( id, username )
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+            if ( !data.affected ) return this._httpResponse.BadRequest( res, `Changes have not been applied` )
 
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:updateUsername: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, data )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:updateUsername: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -140,18 +140,18 @@ export class UserController extends BaseController<UserService> {
      * @param {Response} res - Response =&gt; Express Response object
      * @returns An object with the number of affected rows
      */
-    public updateEmailById = async (req: Request, res: Response): Promise<unknown> => {
+    public updateEmailById = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const { id } = req.params
             const { email } = req.body
-            const data: UpdateResult = await this._service.updateEmailById(id, email)
+            const data: UpdateResult = await this._service.updateEmailById( id, email )
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+            if ( !data.affected ) return this._httpResponse.BadRequest( res, `Changes have not been applied` )
 
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:updateEmailById: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, data )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:updateEmailById: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -161,18 +161,18 @@ export class UserController extends BaseController<UserService> {
      * @param {Response} res - Response =&gt; Express Response object
      * @returns An object with the number of affected rows
      */
-    public updateUserRoleById = async (req: Request, res: Response): Promise<unknown> => {
+    public updateUserRoleById = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const { id } = req.params
             const { role } = req.body
-            const data: UpdateResult = await this._service.updateUserRoleById(id, role)
+            const data: UpdateResult = await this._service.updateUserRoleById( id, role )
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+            if ( !data.affected ) return this._httpResponse.BadRequest( res, `Changes have not been applied` )
 
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:updateUserRoleById: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, data )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:updateUserRoleById: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -182,18 +182,18 @@ export class UserController extends BaseController<UserService> {
      * @param {Response} res - Response =&gt; Express Response object
      * @returns An object with the number of affected rows
      */
-    public updatePasswordById = async (req: Request, res: Response): Promise<unknown> => {
+    public updatePasswordById = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const { id } = req.params
             const { password } = req.body
-            const data: UpdateResult = await this._service.updatePasswordById(id, password)
+            const data: UpdateResult = await this._service.updatePasswordById( id, password )
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Changes have not been applied`)
+            if ( !data.affected ) return this._httpResponse.BadRequest( res, `Changes have not been applied` )
 
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:updatePassword: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, data )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:updatePassword: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -203,17 +203,17 @@ export class UserController extends BaseController<UserService> {
      * @param {Response} res - Response =&gt; Express Response object
      * @returns An object with the number of affected rows
      */
-    public softDeleteUserById = async (req: Request, res: Response): Promise<unknown> => {
+    public softDeleteUserById = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const { idDisabled } = req.params
-            const data: DeleteResult = await this._service.softDeleteUserById(idDisabled)
+            const data: DeleteResult = await this._service.softDeleteUserById( idDisabled )
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to remove the id '${idDisabled}'`)
+            if ( !data.affected ) return this._httpResponse.BadRequest( res, `Unable to remove the id '${ idDisabled }'` )
 
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:deleteUser: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, data )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:deleteUser: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -223,17 +223,17 @@ export class UserController extends BaseController<UserService> {
      * @param {Response} res - Response =&gt; Express Response object
      * @returns An object with the number of affected rows
      */
-    public restoreUserById = async (req: Request, res: Response): Promise<unknown> => {
+    public restoreUserById = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const { idRestore } = req.params
-            const data: UpdateResult = await this._service.restoreUserById(idRestore)
+            const data: UpdateResult = await this._service.restoreUserById( idRestore )
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to restore the id '${idRestore}'`)
+            if ( !data.affected ) return this._httpResponse.BadRequest( res, `Unable to restore the id '${ idRestore }'` )
 
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:restoreUserById: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, data )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:restoreUserById: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -243,17 +243,17 @@ export class UserController extends BaseController<UserService> {
      * @param {Response} res - Response =&gt; Express Response object
      * @returns An object with the number of affected rows
      */
-    public destroyUserById = async (req: Request, res: Response): Promise<unknown> => {
+    public destroyUserById = async ( req: Request, res: Response ): Promise<unknown> => {
         try {
             const { idDestroy } = req.params
-            const data: DeleteResult = await this._service.destroyUserById(idDestroy)
+            const data: DeleteResult = await this._service.destroyUserById( idDestroy )
 
-            if (!data.affected) return this._httpResponse.BadRequest(res, `Unable to destroy the id '${idDestroy}'`)
+            if ( !data.affected ) return this._httpResponse.BadRequest( res, `Unable to destroy the id '${ idDestroy }'` )
 
-            return this._httpResponse.Ok(res, data)
-        } catch (error) {
-            console.log(red(`Error in UserController:deleteUser: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, data )
+        } catch ( error ) {
+            console.log( red( `Error in UserController:deleteUser: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 }

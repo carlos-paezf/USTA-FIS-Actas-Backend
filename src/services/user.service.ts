@@ -1,8 +1,8 @@
-import { UpdateResult, DeleteResult, In } from "typeorm";
-import { BaseService } from "../config";
-import { UserDTO } from "../dtos";
-import { PasswordEncrypter } from "../helpers/password-encrypter.helper";
-import { RoleEntity, UserEntity } from "../models";
+import { UpdateResult, DeleteResult, In } from "typeorm"
+import { BaseService } from "../config"
+import { UserDTO } from "../dtos"
+import { PasswordEncrypter } from "../helpers/password-encrypter.helper"
+import { RoleEntity, UserEntity } from "../models"
 
 
 /**
@@ -13,8 +13,8 @@ import { RoleEntity, UserEntity } from "../models";
  * @author Carlos Páez
  */
 export class UserService extends BaseService<UserEntity> {
-    constructor() {
-        super(UserEntity)
+    constructor () {
+        super( UserEntity )
     }
 
     /**
@@ -35,14 +35,14 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} order - string -&gt; ASC or DESC
      * @returns An array of UserEntity and a number.
      */
-    public async findUsers(from: number, limit: number, all: boolean, order: string): Promise<[UserEntity[], number]> {
-        return (await this.execRepository).findAndCount({
+    public async findUsers ( from: number, limit: number, all: boolean, order: string ): Promise<[ UserEntity[], number ]> {
+        return ( await this.execRepository ).findAndCount( {
             skip: from,
             take: limit,
-            order: { username: (order === 'ASC') ? 'ASC' : 'DESC' },
+            order: { username: ( order === 'ASC' ) ? 'ASC' : 'DESC' },
             withDeleted: all ? true : false,
             relations: { role: true }
-        })
+        } )
     }
 
     /**
@@ -50,11 +50,11 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} id - string
      * @returns The user entity
      */
-    public async findOneUserById(id: string): Promise<UserEntity | null> {
-        return (await this.execRepository).findOne({
+    public async findOneUserById ( id: string ): Promise<UserEntity | null> {
+        return ( await this.execRepository ).findOne( {
             where: { id },
             relations: { role: true }
-        })
+        } )
     }
 
     /**
@@ -62,12 +62,12 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} id - string - the id of the user
      * @returns A promise of a UserEntity or null
      */
-    public async findOneUserByIdIncludeDeleted(id: string): Promise<UserEntity | null> {
-        return (await this.execRepository).findOne({
+    public async findOneUserByIdIncludeDeleted ( id: string ): Promise<UserEntity | null> {
+        return ( await this.execRepository ).findOne( {
             where: { id },
             withDeleted: true,
             relations: { role: true }
-        })
+        } )
     }
 
     /**
@@ -75,11 +75,11 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} email - string - the email of the user
      * @returns A UserEntity object with the password property.
      */
-    public async findUserByEmail(email: string): Promise<UserEntity | null> {
-        return (await this.execRepository).findOne({
+    public async findUserByEmail ( email: string ): Promise<UserEntity | null> {
+        return ( await this.execRepository ).findOne( {
             where: { email },
             select: { id: true, password: true }
-        })
+        } )
     }
 
     /**
@@ -87,11 +87,11 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} username - string
      * @returns A UserEntity object with the password property.
      */
-    public async findUserByUsername(username: string): Promise<UserEntity | null> {
-        return (await this.execRepository).findOne({
+    public async findUserByUsername ( username: string ): Promise<UserEntity | null> {
+        return ( await this.execRepository ).findOne( {
             where: { username },
             select: { id: true, password: true }
-        })
+        } )
     }
 
     /**
@@ -99,8 +99,8 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string[]} arrayIds - string[]
      * @returns An array of UserEntity objects.
      */
-    public async findUsersByIds(arrayIds: string[]): Promise<UserEntity[]> {
-        return (await this.execRepository).findBy({ id: In(arrayIds) })
+    public async findUsersByIds ( arrayIds: string[] ): Promise<UserEntity[]> {
+        return ( await this.execRepository ).findBy( { id: In( arrayIds ) } )
     }
 
     /**
@@ -108,11 +108,11 @@ export class UserService extends BaseService<UserEntity> {
      * @param {UserDTO} body - UserDTO
      * @returns The user object with the password hash.
      */
-    public async createUser(body: UserDTO): Promise<UserEntity> {
-        const newUser = (await this.execRepository).create(body)
-        const passwordHash = await PasswordEncrypter.encrypt(newUser.password)
+    public async createUser ( body: UserDTO ): Promise<UserEntity> {
+        const newUser = ( await this.execRepository ).create( body )
+        const passwordHash = await PasswordEncrypter.encrypt( newUser.password )
         newUser.password = passwordHash
-        return (await this.execRepository).save(newUser)
+        return ( await this.execRepository ).save( newUser )
     }
 
     /**
@@ -121,8 +121,8 @@ export class UserService extends BaseService<UserEntity> {
      * @param {UserDTO} infoUpdate - UserDTO
      * @returns UpdateResult
      */
-    public async updateUserById(id: string, infoUpdate: UserDTO): Promise<UpdateResult> {
-        return (await this.execRepository).update(id, { ...infoUpdate, updatedAt: new Date() })
+    public async updateUserById ( id: string, infoUpdate: UserDTO ): Promise<UpdateResult> {
+        return ( await this.execRepository ).update( id, { ...infoUpdate, updatedAt: new Date() } )
     }
 
     /**
@@ -131,8 +131,8 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} username - string
      * @returns UpdateResult
      */
-    public async updateUsernameById(id: string, username: string): Promise<UpdateResult> {
-        return (await this.execRepository).update(id, { username, updatedAt: new Date() })
+    public async updateUsernameById ( id: string, username: string ): Promise<UpdateResult> {
+        return ( await this.execRepository ).update( id, { username, updatedAt: new Date() } )
     }
 
     /**
@@ -141,8 +141,8 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} email - string
      * @returns UpdateResult
      */
-    public async updateEmailById(id: string, email: string): Promise<UpdateResult> {
-        return (await this.execRepository).update(id, { email, updatedAt: new Date() })
+    public async updateEmailById ( id: string, email: string ): Promise<UpdateResult> {
+        return ( await this.execRepository ).update( id, { email, updatedAt: new Date() } )
     }
 
     /**
@@ -151,8 +151,8 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} email - string
      * @returns UpdateResult
      */
-    public async updateUserRoleById(id: string, role: RoleEntity): Promise<UpdateResult> {
-        return (await this.execRepository).update(id, { role, updatedAt: new Date() })
+    public async updateUserRoleById ( id: string, role: RoleEntity ): Promise<UpdateResult> {
+        return ( await this.execRepository ).update( id, { role, updatedAt: new Date() } )
     }
 
     /**
@@ -161,9 +161,9 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} password - string
      * @returns UpdateResult
      */
-    public async updatePasswordById(id: string, password: string): Promise<UpdateResult> {
-        const passwordHash = await PasswordEncrypter.encrypt(password)
-        return (await this.execRepository).update(id, { password: passwordHash, updatedAt: new Date() })
+    public async updatePasswordById ( id: string, password: string ): Promise<UpdateResult> {
+        const passwordHash = await PasswordEncrypter.encrypt( password )
+        return ( await this.execRepository ).update( id, { password: passwordHash, updatedAt: new Date() } )
     }
 
     /**
@@ -172,8 +172,8 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} id - string - the id of the user to be deleted
      * @returns The DeleteResult is a class that is used to return the number of affected rows.
      */
-    public async softDeleteUserById(id: string): Promise<DeleteResult> {
-        return (await this.execRepository).softDelete(id)
+    public async softDeleteUserById ( id: string ): Promise<DeleteResult> {
+        return ( await this.execRepository ).softDelete( id )
     }
 
     /**
@@ -181,8 +181,8 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} id - string - the id of the user to be restored
      * @returns UpdateResult
      */
-    public async restoreUserById(id: string): Promise<UpdateResult> {
-        return (await this.execRepository).restore(id)
+    public async restoreUserById ( id: string ): Promise<UpdateResult> {
+        return ( await this.execRepository ).restore( id )
     }
 
     /**
@@ -190,8 +190,8 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} id - string - The id of the user to delete
      * @returns DeleteResult
      */
-    public async destroyUserById(id: string): Promise<DeleteResult> {
-        return (await this.execRepository).delete({ id })
+    public async destroyUserById ( id: string ): Promise<DeleteResult> {
+        return ( await this.execRepository ).delete( { id } )
     }
 
     /**
@@ -199,10 +199,10 @@ export class UserService extends BaseService<UserEntity> {
      * @param {string} id - string - the id of the user
      * @returns The user entity with the id and deletedAt fields.
      */
-    public async userIsEnabled(id: string): Promise<UserEntity | null> {
-        return (await this.execRepository).findOne({
+    public async userIsEnabled ( id: string ): Promise<UserEntity | null> {
+        return ( await this.execRepository ).findOne( {
             where: { id, deletedAt: undefined },
             select: { id: true }
-        })
+        } )
     }
 }

@@ -61,6 +61,7 @@ CREATE TABLE `users` (
     `email` varchar(255) NOT NULL,
     `password` varchar(255) NOT NULL,
     `position` varchar(255) NOT NULL,
+    `profile_image` text NOT NULL,
     `role_id` varchar(36) NULL,
     UNIQUE INDEX `IDX_fe0bb3f6520ee0469504521e71` (`username`),
     UNIQUE INDEX `IDX_97672ac88f789774dd47f7c8be` (`email`),

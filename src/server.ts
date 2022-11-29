@@ -27,17 +27,17 @@ import {
  */
 class ServerBootstrap extends ConfigServer {
     private _app: express.Application = express()
-    private _port: number = this.getNumberEnv(`PORT`) || 3000
+    private _port: number = this.getNumberEnv( `PORT` ) || 3000
 
-    constructor() {
+    constructor () {
         super()
 
         this._dbConnect()
 
         this._middlewares()
 
-        this._app.use('/auth/', new AuthRouter().router)
-        this._app.use('/api/v1/', this._routers())
+        this._app.use( '/auth/', new AuthRouter().router )
+        this._app.use( '/api/', this._routers() )
 
         this._listen()
     }
@@ -48,8 +48,8 @@ class ServerBootstrap extends ConfigServer {
      */
     private _dbConnect = async (): Promise<DataSource | void> => {
         return this.dbConnection
-            .then(() => console.log(green.italic(`> Conexión establecida con la base de datos ${this.getEnvironment('DB_DATABASE')}`)))
-            .catch((error) => console.log(red.italic(`> Error intentando conectar la base de datos ${this.getEnvironment('DB_DATABASE')}`), error))
+            .then( () => console.log( green.italic( `> Conexión establecida con la base de datos ${ this.getEnvironment( 'DB_DATABASE' ) }` ) ) )
+            .catch( ( error ) => console.log( red.italic( `> Error intentando conectar la base de datos ${ this.getEnvironment( 'DB_DATABASE' ) }` ), error ) )
     }
 
 
@@ -57,22 +57,22 @@ class ServerBootstrap extends ConfigServer {
      * This function is used to set up the middlewares for the express application.
      */
     private _middlewares = (): void => {
-        this._app.use(express.json())
-        this._app.use(express.urlencoded({ extended: true }))
-        this._app.use(morgan('common'))
-        this._app.use(morgan(
+        this._app.use( express.json( { limit: "10mb" } ) )
+        this._app.use( express.urlencoded( { limit: "10mb", extended: true, parameterLimit: 1000000 } ) )
+        this._app.use( morgan( 'common' ) )
+        this._app.use( morgan(
             ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :req[header] :res[content-type]',
             {
                 stream: accessLoggerStream
             }
-        ))
-        morganBody(this._app, {
-            noColors: true,
-            skip: function (req, res) { return res.statusCode < 500 },
-            stream: loggerStream
-        })
-        this._app.use(cors())
-        this._app.use(express.static(`../storage`))
+        ) )
+        // morganBody( this._app, {
+        //     noColors: true,
+        //     skip: function ( req, res ) { return res.statusCode < 500 },
+        //     stream: loggerStream
+        // } )
+        this._app.use( cors() )
+        this._app.use( express.static( `../storage` ) )
     }
 
 
@@ -97,9 +97,9 @@ class ServerBootstrap extends ConfigServer {
      * Listening to the port.
      */
     private _listen = () => {
-        this._app.listen(this._port, () => {
-            console.log(blue(`Servidor corriendo en ${this.getEnvironment(`PUBLIC_URL`)}:${this.getNumberEnv(`PORT`)}`))
-        })
+        this._app.listen( this._port, () => {
+            console.log( blue( `Servidor corriendo en ${ this.getEnvironment( `PUBLIC_URL` ) }:${ this.getNumberEnv( `PORT` ) }` ) )
+        } )
     }
 }
 

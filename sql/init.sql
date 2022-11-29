@@ -65,6 +65,7 @@ CREATE TABLE `users` (
     `email` varchar(255) NOT NULL,
     `password` varchar(255) NOT NULL,
     `position` varchar(255) NOT NULL,
+    `profile_image` longblob NOT NULL,
     `role_id` varchar(36) NULL,
     UNIQUE INDEX `IDX_fe0bb3f6520ee0469504521e71` (`username`),
     UNIQUE INDEX `IDX_97672ac88f789774dd47f7c8be` (`email`),
@@ -202,8 +203,8 @@ VALUES (
     );
 INSERT INTO `modules` (`id`, `module_name`, `module_description`)
 VALUES (
-        'minutes-of-meeting',
-        'MINUTES OF MEETING',
+        'meeting-minutes',
+        'MEETING MINUTES',
         'Meeting Minutes Management Module'
     );
 INSERT INTO `modules` (`id`, `module_name`, `module_description`)
@@ -290,42 +291,42 @@ INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permissi
 VALUES (
         uuid(),
         'developer',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'create'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'developer',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'read'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'developer',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'update'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'developer',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'soft-delete'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'developer',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'restore'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'developer',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'hard-delete'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
@@ -494,25 +495,25 @@ VALUES (uuid(), 'dean', 'permissions', 'restore');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'dean', 'permissions', 'hard-delete');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'dean', 'minutes-of-meeting', 'create');
+VALUES (uuid(), 'dean', 'meeting-minutes', 'create');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'dean', 'minutes-of-meeting', 'read');
+VALUES (uuid(), 'dean', 'meeting-minutes', 'read');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'dean', 'minutes-of-meeting', 'update');
+VALUES (uuid(), 'dean', 'meeting-minutes', 'update');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'dean',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'soft-delete'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'dean', 'minutes-of-meeting', 'restore');
+VALUES (uuid(), 'dean', 'meeting-minutes', 'restore');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'dean',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'hard-delete'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
@@ -646,28 +647,28 @@ INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permissi
 VALUES (
         uuid(),
         'professor',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'create'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'professor',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'read'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'professor',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'update'
     );
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (
         uuid(),
         'professor',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'soft-delete'
     );
 -- Permisos para administrativo
@@ -677,17 +678,17 @@ INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permissi
 VALUES (
         uuid(),
         'administrative',
-        'minutes-of-meeting',
+        'meeting-minutes',
         'read'
     );
 -- Permisos para desarrollador
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
 VALUES (uuid(), 'student', 'users', 'read');
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'student', 'minutes-of-meeting', 'read');
+VALUES (uuid(), 'student', 'meeting-minutes', 'read');
 -- Permisos para invitado
 INSERT INTO `roles_modules_permissions` (`id`, `role_id`, `module_id`, `permission_id`)
-VALUES (uuid(), 'guest', 'minutes-of-meeting', 'read');
+VALUES (uuid(), 'guest', 'meeting-minutes', 'read');
 /* --------------------------------------------------------------- */
 /* Inserción temporal para developer */
 /* --------------------------------------------------------------- */
@@ -702,6 +703,7 @@ INSERT INTO `users`(
         `email`,
         `password`,
         `position`,
+        `profile_image`,
         `role_id`
     )
 VALUES (
@@ -715,6 +717,7 @@ VALUES (
         "carlos-paezf@usantoto.edu.co",
         "$2b$10$dSbyYv5ok9VBipMkTy7tDOXF5ZeIQCkygOzmiO3o0nl6VkyLH5/qG",
         "Desarrollador",
+        "N/A",
         "developer"
     );
 INSERT INTO `users`(
@@ -728,6 +731,7 @@ INSERT INTO `users`(
         `email`,
         `password`,
         `position`,
+        `profile_image`,
         `role_id`
     )
 VALUES (
@@ -741,5 +745,34 @@ VALUES (
         "test_base@gmail.com",
         "$2b$10$dSbyYv5ok9VBipMkTy7tDOXF5ZeIQCkygOzmiO3o0nl6VkyLH5/qG",
         "Prueba",
+        "N/A",
         "professor"
+    );
+INSERT INTO `users`(
+        `id`,
+        `created_at`,
+        `updated_at`,
+        `deleted_at`,
+        `name`,
+        `last_name`,
+        `username`,
+        `email`,
+        `password`,
+        `position`,
+        `profile_image`,
+        `role_id`
+    )
+VALUES (
+        (@i := uuid()),
+        DEFAULT,
+        DEFAULT,
+        DEFAULT,
+        "Usuario Invitado",
+        "Invitado",
+        "guest_user",
+        "guest@gmail.com",
+        "$2b$10$dSbyYv5ok9VBipMkTy7tDOXF5ZeIQCkygOzmiO3o0nl6VkyLH5/qG",
+        "Invitado",
+        "N/A",
+        "guest"
     );

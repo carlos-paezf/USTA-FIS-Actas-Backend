@@ -1,15 +1,16 @@
-import passport from 'passport';
-import { NextFunction, Request, Response } from 'express';
+import passport from 'passport'
+import { NextFunction, Request, Response } from 'express'
 
-import { HttpResponse } from "../response/http.response";
-import { UserEntity } from '../../models';
-import { RoleService, UserService } from '../../services';
-import { RolesID } from '../../helpers/enums.helper';
-import { UserDTO } from '../../dtos';
-import { validate } from 'class-validator';
-import { red } from 'colors';
-import { AuthService } from '../../auth/services/auth.service';
-import { ModulePermission, TokenPayload } from '../../auth/types/auth.interface';
+import { HttpResponse } from "../response/http.response"
+import { UserEntity } from '../../models'
+import { RoleService, UserService } from '../../services'
+import { RolesID } from '../../helpers/enums.helper'
+import { UserDTO } from '../../dtos'
+import { validate } from 'class-validator'
+import { red } from 'colors'
+import { AuthService } from '../../auth/services/auth.service'
+import { ModulePermission, TokenPayload } from '../../auth/types/auth.interface'
+import { CustomFieldsHelper } from '../../helpers/custom-fields.helper'
 
 
 export class AuthMiddleware {
@@ -17,7 +18,7 @@ export class AuthMiddleware {
     private readonly _roleService: RoleService
     private readonly _userService: UserService
 
-    constructor(protected readonly httpResponse: HttpResponse = new HttpResponse()) {
+    constructor ( protected readonly httpResponse: HttpResponse = new HttpResponse() ) {
         this._authService = new AuthService()
         this._roleService = new RoleService()
         this._userService = new UserService()
@@ -31,17 +32,17 @@ export class AuthMiddleware {
      * middleware in the chain.
      * @returns the result of the next() function.
      */
-    public validateRoleIsEnabled = async (req: Request, res: Response, next: NextFunction) => {
+    public validateRoleIsEnabled = async ( req: Request, res: Response, next: NextFunction ) => {
         try {
             const { role } = req.body
-            const roleEnabled = await this._roleService.roleIsEnabled(role)
+            const roleEnabled = await this._roleService.roleIsEnabled( role )
 
-            return (!roleEnabled)
-                ? this.httpResponse.PreconditionFailed(res, `Role with id ${role} is disabled or has been removed`)
+            return ( !roleEnabled )
+                ? this.httpResponse.PreconditionFailed( res, `Role with id ${ role } is disabled or has been removed` )
                 : next()
-        } catch (error) {
-            console.log(red(`Error in SharedMiddleware:validateRoleIsEnabled: `), error)
-            return this.httpResponse.InternalServerError(res, error)
+        } catch ( error ) {
+            console.log( red( `Error in SharedMiddleware:validateRoleIsEnabled: ` ), error )
+            return this.httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -51,8 +52,8 @@ export class AuthMiddleware {
      * @returns A function that takes a type and returns a function that takes a request and response
      * and returns a function that takes an error, user, and info.
      */
-    public passAuth = (type: string) => {
-        return passport.authenticate(type, { session: true })
+    public passAuth = ( type: string ) => {
+        return passport.authenticate( type, { session: true } )
     }
 
     /**
@@ -61,13 +62,13 @@ export class AuthMiddleware {
      * @param {string} permissionId - string - This is the permission id that you want to check for.
      * @returns A function that takes in a Request, Response, and NextFunction.
      */
-    public checkRoleModulePermission = (moduleId: string, permissionId: string) =>
-        async (req: Request, res: Response, next: NextFunction) => {
+    public checkRoleModulePermission = ( moduleId: string, permissionId: string ) =>
+        async ( req: Request, res: Response, next: NextFunction ) => {
             try {
                 const user = req.user as TokenPayload
 
-                if (user.role.deletedAt !== null) {
-                    return this.httpResponse.Forbidden(res, `You do not have permission to access`)
+                if ( user.role.deletedAt !== null ) {
+                    return this.httpResponse.Forbidden( res, `You do not have permission to access` )
                 }
 
                 /* const userQuery = await _roleModulePermissionService.validateRoleModulePermissionForJWT(user.role.id, moduleId, permissionId)
@@ -77,20 +78,20 @@ export class AuthMiddleware {
 
                 const userQuery: ModulePermission[] = []
 
-                for (const modPer of user.modulesPermissions) {
-                    if (modPer.moduleId === moduleId && modPer.permissionId === permissionId) {
-                        userQuery.push(modPer)
+                for ( const modPer of user.modulesPermissions ) {
+                    if ( modPer.moduleId === moduleId && modPer.permissionId === permissionId ) {
+                        userQuery.push( modPer )
                     }
                 }
 
-                if (!userQuery || !userQuery.length) {
-                    return this.httpResponse.Forbidden(res, `You do not have permission to access`)
+                if ( !userQuery || !userQuery.length ) {
+                    return this.httpResponse.Forbidden( res, `You do not have permission to access` )
                 }
 
                 next()
-            } catch (error) {
-                console.log(red(`Error un AuthMiddleware:checkRoleModulePermission: `), error)
-                return this.httpResponse.InternalServerError(res, error)
+            } catch ( error ) {
+                console.log( red( `Error un AuthMiddleware:checkRoleModulePermission: ` ), error )
+                return this.httpResponse.InternalServerError( res, error )
             }
         }
 
@@ -104,16 +105,16 @@ export class AuthMiddleware {
      * middleware is done.
      * @returns A boolean value.
      */
-    public checkAdminRole = async (req: Request, res: Response, next: NextFunction) => {
+    public checkAdminRole = async ( req: Request, res: Response, next: NextFunction ) => {
         const user = req.user as UserEntity
 
-        if (!user) return this.httpResponse.Unauthorized(res, `You do not have permission to access`)
+        if ( !user ) return this.httpResponse.Forbidden( res, `You do not have permission to access` )
 
-        return (user.role.id === RolesID.DEAN)
+        return ( user.role.id === RolesID.DEAN )
             ? next()
-            : (user.role.id === RolesID.DEVELOPER)
+            : ( user.role.id === RolesID.DEVELOPER )
                 ? next()
-                : this.httpResponse.Unauthorized(res, `You do not have permission to access`)
+                : this.httpResponse.Forbidden( res, `You do not have permission to access` )
     }
 
     /**
@@ -124,21 +125,21 @@ export class AuthMiddleware {
      * @param {NextFunction} next - NextFunction - The next middleware function in the stack.
      * @returns The return value of the next() function.
      */
-    public usernameAndEmailValidator = async (req: Request, res: Response, next: NextFunction) => {
+    public usernameAndEmailValidator = async ( req: Request, res: Response, next: NextFunction ) => {
         const { username, email } = req.body
-        if (username) {
-            const userByUsername = await this._userService.findUserByUsername(username.toUpperCase())
+        if ( username ) {
+            const userByUsername = await this._userService.findUserByUsername( username.toUpperCase() )
 
-            if (userByUsername) {
-                return this.httpResponse.BadRequest(res, `The username '${username}' is already being used`)
+            if ( userByUsername ) {
+                return this.httpResponse.BadRequest( res, `The username '${ username }' is already being used` )
             }
         }
 
-        if (email) {
-            const userByEmail = await this._userService.findUserByEmail(email.toUpperCase())
+        if ( email ) {
+            const userByEmail = await this._userService.findUserByEmail( email.toUpperCase() )
 
-            if (userByEmail) {
-                return this.httpResponse.BadRequest(res, `The email '${email}' is already being used`)
+            if ( userByEmail ) {
+                return this.httpResponse.BadRequest( res, `The email '${ email }' is already being used` )
             }
         }
 
@@ -151,22 +152,21 @@ export class AuthMiddleware {
      * @param {Response} res - Response - Express response object
      * @param {NextFunction} next - NextFunction - The next middleware function in the stack.
      */
-    public userValidator = (req: Request, res: Response, next: NextFunction) => {
-        const { name, lastName, username, email, password, position, role } = req.body
+    public userValidator = ( req: Request, res: Response, next: NextFunction ) => {
+        const { name, lastName, username, email, position, role } = req.body
 
-        const valid = new UserDTO()
+        const valid = new CustomFieldsHelper()
 
         valid.name = name
         valid.lastName = lastName
         valid.username = username
         valid.email = email
-        valid.password = password
         valid.position = position
         valid.role = role
 
-        validate(valid).then((error) => {
-            return error.length ? this.httpResponse.PreconditionFailed(res, error) : next()
-        })
+        validate( valid ).then( ( error ) => {
+            return error.length ? this.httpResponse.PreconditionFailed( res, error ) : next()
+        } )
     }
 
     /**
@@ -176,31 +176,31 @@ export class AuthMiddleware {
      * @param {NextFunction} next - NextFunction
      * @returns The function validateJWT is being returned.
      */
-    public validateJWT = async (req: Request, res: Response, next: NextFunction) => {
+    public validateJWT = async ( req: Request, res: Response, next: NextFunction ) => {
         try {
             let jwt = req.headers.authorization
-            if (!jwt) return this.httpResponse.Unauthorized(res, `Token not found`)
+            if ( !jwt ) return this.httpResponse.Unauthorized( res, `Token not found` )
 
             try {
-                if (jwt.toLocaleLowerCase().startsWith('bearer')) {
-                    jwt = jwt.slice('bearer'.length).trim()
+                if ( jwt.toLocaleLowerCase().startsWith( 'bearer' ) ) {
+                    jwt = jwt.slice( 'bearer'.length ).trim()
                 }
-                if (!jwt) return this.httpResponse.Unauthorized(res, `Token Not Found`)
+                if ( !jwt ) return this.httpResponse.Unauthorized( res, `Token Not Found` )
 
-                const payload = await this._authService.verifyJWT(jwt) as TokenPayload
+                const payload = await this._authService.verifyJWT( jwt ) as TokenPayload
 
                 req.user = payload
                 next()
                 // eslint-disable-next-line
-            } catch (error: any) {
-                if (error.name === 'TokenExpiredError') return this.httpResponse.Unauthorized(res, `Expired JWT`)
+            } catch ( error: any ) {
+                if ( error.name === 'TokenExpiredError' ) return this.httpResponse.Unauthorized( res, `Expired JWT` )
 
-                console.log(red(`Error un AuthMiddleware: validateJWT: `), error)
-                return this.httpResponse.InternalServerError(res, error)
+                // console.log(red(`Error un AuthMiddleware: validateJWT: `), error)
+                return this.httpResponse.BadRequest( res, error )
             }
-        } catch (error) {
-            console.log(red(`Error un AuthMiddleware: validateJWT: `), error)
-            return this.httpResponse.InternalServerError(res, error)
+        } catch ( error ) {
+            console.log( red( `Error un AuthMiddleware: validateJWT: ` ), error )
+            return this.httpResponse.InternalServerError( res, error )
         }
     }
 }

@@ -1,15 +1,15 @@
-import { red } from "colors";
-import { Request, Response } from "express";
+import { red } from "colors"
+import { Request, Response } from "express"
 
-import { UserEntity } from "../../models";
-import { HttpResponse } from "../../shared/response/http.response";
-import { AuthService } from "../services/auth.service";
-import { RolesID } from "../../helpers/enums.helper";
+import { UserEntity } from "../../models"
+import { HttpResponse } from "../../shared/response/http.response"
+import { AuthService } from "../services/auth.service"
+import { RolesID } from "../../helpers/enums.helper"
 
 
 export class AuthController extends AuthService {
 
-    constructor(private readonly _httpResponse: HttpResponse = new HttpResponse()) {
+    constructor ( private readonly _httpResponse: HttpResponse = new HttpResponse() ) {
         super()
     }
 
@@ -20,28 +20,28 @@ export class AuthController extends AuthService {
      * @param {Response} res - Response - the response object
      * @returns The accessToken is being returned.
      */
-    public login = async (req: Request, res: Response) => {
+    public login = async ( req: Request, res: Response ) => {
         try {
             const { emailOrUsername, password } = req.body
 
-            if (!emailOrUsername || emailOrUsername.trim() === '') {
-                return this._httpResponse.BadRequest(res, `Unable to send empty email field`)
+            if ( !emailOrUsername || emailOrUsername.trim() === '' ) {
+                return this._httpResponse.BadRequest( res, `Unable to send empty email field` )
             }
 
-            if (!password || password.trim === '') {
-                return this._httpResponse.BadRequest(res, `Unable to send empty password field`)
+            if ( !password || password.trim === '' ) {
+                return this._httpResponse.BadRequest( res, `Unable to send empty password field` )
             }
 
-            const user = await this.validateUser(emailOrUsername, password)
-            if (!user) return this._httpResponse.Unauthorized(res, `Invalid email/username or password`)
+            const user = await this.validateUser( emailOrUsername, password )
+            if ( !user ) return this._httpResponse.Unauthorized( res, `Invalid email/username or password` )
 
-            const encode = await this.generateJWT(user.id)
-            if (!encode) return this._httpResponse.Unauthorized(res, `You do not have permission to access`)
+            const encode = await this.generateJWT( user.id )
+            if ( !encode ) return this._httpResponse.Unauthorized( res, `You do not have permission to access` )
 
-            return this._httpResponse.Ok(res, encode)
-        } catch (error) {
-            console.log(red(`Error in AuthController:login: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, encode )
+        } catch ( error ) {
+            console.log( red( `Error in AuthController:login: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -52,22 +52,22 @@ export class AuthController extends AuthService {
      * @param {Response} res - Response =&gt; Express.Response
      * @returns The user object
      */
-    public register = async (req: Request, res: Response) => {
+    public register = async ( req: Request, res: Response ) => {
         try {
             const data = req.body
             data.role = RolesID.GUEST
 
-            const user = await this._userService.createUser({ ...data })
+            const user = await this._userService.createUser( { ...data } )
 
-            const encode = await this.generateJWT(user.id)
-            if (!encode) return this._httpResponse.Unauthorized(res, `You do not have permission to access`)
+            const encode = await this.generateJWT( user.id )
+            if ( !encode ) return this._httpResponse.Unauthorized( res, `You do not have permission to access` )
 
             // TODO: Emitir un socket para alertar la creación de un usuario, y lograr cambiar su rol en caso necesario
 
-            return this._httpResponse.Created(res, encode)
-        } catch (error) {
-            console.log(red(`Error in AuthController:register: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Created( res, encode )
+        } catch ( error ) {
+            console.log( red( `Error in AuthController:register: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -78,26 +78,26 @@ export class AuthController extends AuthService {
      * client
      * @returns The return is a function that is being called with the parameters res and error.
      */
-    public validateExistsEmailOrUsername = async (req: Request, res: Response) => {
+    public validateExistsEmailOrUsername = async ( req: Request, res: Response ) => {
         try {
             const { email = '', username = '' } = req.query
 
-            if (String(email).trim() !== '') {
-                const data = await this._userService.findUserByEmail(String(email))
+            if ( String( email ).trim() !== '' ) {
+                const data = await this._userService.findUserByEmail( String( email ) )
 
-                if (data) return this._httpResponse.Ok(res, { isUnique: false })
+                if ( data ) return this._httpResponse.Ok( res, { isUnique: false } )
             }
 
-            if (String(username).trim() !== '') {
-                const data = await this._userService.findUserByUsername(String(username))
+            if ( String( username ).trim() !== '' ) {
+                const data = await this._userService.findUserByUsername( String( username ) )
 
-                if (data) return this._httpResponse.Ok(res, { isUnique: false })
+                if ( data ) return this._httpResponse.Ok( res, { isUnique: false } )
             }
 
-            return this._httpResponse.Ok(res, { isUnique: true })
-        } catch (error) {
-            console.log(red(`Error in AuthController:validateExistsEmailOrUsername: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, { isUnique: true } )
+        } catch ( error ) {
+            console.log( red( `Error in AuthController:validateExistsEmailOrUsername: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 
@@ -107,18 +107,18 @@ export class AuthController extends AuthService {
      * @param {Response} res - Response =&gt; Express.Response
      * @returns The user and the JWT token
      */
-    public renewToken = async (req: Request, res: Response) => {
+    public renewToken = async ( req: Request, res: Response ) => {
         try {
             const user = req.user as UserEntity
-            if (!user) return this._httpResponse.NotFound(res, `No user found in the request`)
+            if ( !user ) return this._httpResponse.NotFound( res, `No user found in the request` )
 
-            const encode = await this.generateJWT(user.id)
-            if (!encode) return this._httpResponse.Unauthorized(res, `You do not have permission to access`)
+            const encode = await this.generateJWT( user.id )
+            if ( !encode ) return this._httpResponse.Unauthorized( res, `You do not have permission to access` )
 
-            return this._httpResponse.Ok(res, encode)
-        } catch (error) {
-            console.log(red(`Error in AuthController:renewToken: `), error)
-            return this._httpResponse.InternalServerError(res, error)
+            return this._httpResponse.Ok( res, encode )
+        } catch ( error ) {
+            console.log( red( `Error in AuthController:renewToken: ` ), error )
+            return this._httpResponse.InternalServerError( res, error )
         }
     }
 }

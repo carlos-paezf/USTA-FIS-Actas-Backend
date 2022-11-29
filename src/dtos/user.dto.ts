@@ -1,6 +1,6 @@
-import { IsEmail, IsNotEmpty, IsOptional, MaxLength, MinLength } from "class-validator";
-import { BaseDTO } from "../config";
-import { RoleEntity } from "../models";
+import { IsEmail, IsNotEmpty, IsOptional, MaxLength, MinLength } from "class-validator"
+import { BaseDTO } from "../config"
+import { RoleEntity } from "../models"
 
 
 /** 
@@ -32,8 +32,8 @@ export class UserDTO extends BaseDTO {
     lastName!: string
 
     @IsNotEmpty()
-    @MinLength(6)
-    @MaxLength(15)
+    @MinLength( 6 )
+    @MaxLength( 15 )
     username!: string
 
     @IsEmail()
@@ -41,7 +41,7 @@ export class UserDTO extends BaseDTO {
     email!: string
 
     @IsNotEmpty()
-    @MinLength(6)
+    @MinLength( 6 )
     password!: string
 
     /*  @IsOptional()
@@ -53,4 +53,7 @@ export class UserDTO extends BaseDTO {
 
     @IsOptional()
     role?: RoleEntity
+
+    @IsNotEmpty()
+    profileImage!: string
 }
